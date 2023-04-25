@@ -1,0 +1,11 @@
+- admin
+---------------- office
+- user request (ada banyak) ->default
+- supervisor (1 orang untuk approval) ->default
+opsi (tambah sendiri)
+- tambah role + usernya siapa (1 orang tiap role)
+
+
+---------------- procurement
+- supervisor (1 orang tiap role) ->default
+- tambah role + usernya siapa (1 orang tiap role)

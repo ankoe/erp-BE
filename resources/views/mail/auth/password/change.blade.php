@@ -1,0 +1,1 @@
+<p>Password di ubah pada {{ $updatedAt }}</p>
