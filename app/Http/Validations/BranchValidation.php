@@ -69,7 +69,10 @@ class BranchValidation
     public static function store()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'name' => ['required', 'string', 'max:100'],
+            'address' => ['nullable', 'string', 'max:100'],
+            'email' => ['nullable', 'email:rfc,dns'],
+            'mobile' => ['nullable', 'digits_between:11,13'],
         ];
     }
 
@@ -79,7 +82,10 @@ class BranchValidation
     public static function update()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'name' => ['required', 'string', 'max:100'],
+            'address' => ['nullable', 'string', 'max:100'],
+            'email' => ['nullable', 'email:rfc,dns'],
+            'mobile' => ['nullable', 'digits_between:11,13'],
         ];
     }
 

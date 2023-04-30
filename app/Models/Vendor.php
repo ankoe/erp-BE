@@ -23,6 +23,11 @@ class Vendor extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function materialCategory()
+    {
+        return $this->belongsTo(MaterialCategory::class);
+    }
+
     /***********************************************
      *  2. Getter & Setter
     ***********************************************/

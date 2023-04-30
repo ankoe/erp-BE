@@ -69,7 +69,7 @@ class MaterialCategoryValidation
     public static function store()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'name' => ['required', 'string', 'max:100'],
         ];
     }
 
@@ -79,7 +79,7 @@ class MaterialCategoryValidation
     public static function update()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'name' => ['required', 'string', 'max:100'],
         ];
     }
 

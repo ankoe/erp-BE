@@ -69,7 +69,8 @@ class VendorValidation
     public static function store()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'material_category_id' => ['required', 'integer', 'exists:App\Models\MaterialCategory,id'],
+            'name' => ['required', 'string', 'max:50'],
         ];
     }
 
@@ -79,7 +80,8 @@ class VendorValidation
     public static function update()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'material_category_id' => ['required', 'integer', 'exists:App\Models\MaterialCategory,id'],
+            'name' => ['required', 'string', 'max:50'],
         ];
     }
 
