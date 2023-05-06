@@ -73,13 +73,14 @@ class MaterialController extends Controller
         $user = auth()->user();
 
         $material = Material::Create([
-            'company_id'         => $user->company->id,
-            'material_category_id'           => $request->material_category_id,
-            'name'           => $request->name,
-            'number'           => $request->number,
+            'company_id'            => $user->company->id,
+            'material_category_id'  => $request->material_category_id,
+            'name'                  => $request->name,
+            'number'                => $request->number,
             'description'           => $request->description,
-            'uom'           => $request->uom,
-            'price'           => $request->price,
+            'uom'                   => $request->uom,
+            'price'                 => $request->price,
+            'stock'                 => $request->stock,
         ]);
 
         return $this->responseSuccess($material, 'Add new account');
@@ -100,12 +101,13 @@ class MaterialController extends Controller
 
         if ($material)
         {
-            $material->material_category_id    = $request->material_category_id;
-            $material->name    = $request->name;
-            $material->number    = $request->number;
-            $material->description    = $request->description;
-            $material->uom    = $request->uom;
-            $material->price    = $request->price;
+            $material->material_category_id = $request->material_category_id;
+            $material->name                 = $request->name;
+            $material->number               = $request->number;
+            $material->description          = $request->description;
+            $material->uom                  = $request->uom;
+            $material->price                = $request->price;
+            $material->stock                = $request->stock;
 
             $material->save();
 

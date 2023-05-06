@@ -71,6 +71,7 @@ class VendorValidation
         return [
             'material_category_id' => ['required', 'integer', 'exists:App\Models\MaterialCategory,id'],
             'name' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'email:rfc,dns', 'max:50'],
         ];
     }
 
@@ -82,6 +83,7 @@ class VendorValidation
         return [
             'material_category_id' => ['required', 'integer', 'exists:App\Models\MaterialCategory,id'],
             'name' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'email:rfc,dns', 'max:50'],
         ];
     }
 

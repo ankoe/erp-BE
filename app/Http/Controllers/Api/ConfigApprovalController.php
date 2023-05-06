@@ -20,46 +20,11 @@ class ConfigApprovalController extends Controller
 
         $user = auth()->user();
 
-        $configApprovals = ConfigApproval::filter(new ConfigApprovalFilter($request))->where('company_id', $user->company->id)->paginate($request->input('per_page', 10));
+        $configApprovals = ConfigApproval::filter(new ConfigApprovalFilter($request))
+                                ->where('company_id', $user->company->id)
+                                ->get();
 
         return ConfigApprovalResource::collection($configApprovals);
-    }
-
-
-    public function all(Request $request)
-    {
-        $validated = Validator::make($request->all(), ConfigApprovalValidation::all());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
-
-        $user = auth()->user();
-
-        // Perlu diseragamkan return responsenya
-        $configApprovals = ConfigApproval::filter(new ConfigApprovalFilter($request))->where('company_id', $user->company->id)->get();
-
-        return ConfigApprovalResource::collection($configApprovals);
-    }
-
-
-    public function show(Request $request, $id)
-    {
-
-        $request['id'] = $id;
-
-        $validated = Validator::make($request->all(), ConfigApprovalValidation::show());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $configApproval = ConfigApproval::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($configApproval)
-        {
-            return $this->responseSuccess(new ConfigApprovalResource($configApproval), 'Get detail');
-        }
-
-        return $this->responseError([], 'Not found');
     }
 
 
@@ -73,38 +38,12 @@ class ConfigApprovalController extends Controller
         $user = auth()->user();
 
         $configApproval = ConfigApproval::Create([
-            'company_id'         => $user->company->id,
+            'company_id'      => $user->company->id,
             'user_id'         => $request->user_id,
-            'order'           => $request->order,
+            'order'           => 99, // set paling terakhir
         ]);
 
         return $this->responseSuccess($configApproval, 'Add new account');
-    }
-
-
-    public function update(Request $request, $id)
-    {
-        $request['id'] = $id;
-
-        $validated = Validator::make($request->all(), ConfigApprovalValidation::update());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $configApproval = ConfigApproval::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($configApproval)
-        {
-            $configApproval->user_id      = $request->user_id;
-            $configApproval->order      = $request->order;
-
-            $configApproval->save();
-
-            return $this->responseSuccess(new ConfigApprovalResource($configApproval), 'Update detail');
-        }
-
-        return $this->responseError([], 'Not found');
     }
 
 
@@ -121,13 +60,35 @@ class ConfigApprovalController extends Controller
 
         if ($configApproval)
         {
-            // income dijadikan null atau di ubah ke kategori lainnya
-
             $configApproval->delete();
 
             return $this->responseSuccess($configApproval, 'Delete Record', 204);
         }
 
         return $this->responseError([], 'Not found');
+    }
+
+
+    public function sort(Request $request)
+    {
+        $validated = Validator::make($request->all(), ConfigApprovalValidation::sort());
+
+        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
+
+        $user = auth()->user();
+
+        foreach ($request->approvals as $approval) {
+            $configApproval = ConfigApproval::where('company_id', $user->company->id)
+                                ->where('id', $approval['id'])
+                                ->first();
+
+            if ($configApproval)
+            {
+                $configApproval->order      = $approval['order'];
+                $configApproval->save();
+            }
+        }
+
+        return $this->responseSuccess([], 'sort success');
     }
 }

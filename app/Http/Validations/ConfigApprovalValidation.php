@@ -34,52 +34,11 @@ class ConfigApprovalValidation
     /**
      * @return array
      */
-    public static function all()
-    {
-        return [
-            'order_type' => [
-                Rule::in(['asc', 'desc'])
-            ],
-            'order_by' => [
-                Rule::in([
-                ])
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public static function show()
-    {
-        return [
-            // 'order_type' => [
-            //     Rule::in(['asc', 'desc'])
-            // ],
-            // 'order_by' => [
-            //     Rule::in([
-            //     ])
-            // ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
     public static function store()
     {
         return [
-            // 'label' => ['required', 'string', 'max:30'],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public static function update()
-    {
-        return [
-            // 'label' => ['required', 'string', 'max:30'],
+            'role_id' => ['required', 'integer', 'exists:App\Models\Role,id'],
+            'group' => ['required', 'string', Rule::in(RoleGroup::getValues())],
         ];
     }
 
@@ -96,6 +55,18 @@ class ConfigApprovalValidation
             //     Rule::in([
             //     ])
             // ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function sort()
+    {
+        return [
+            'approvals' => ['required', 'array'],
+            'approvals.*.id' => ['required', 'integer', 'distinct', 'exists:App\Models\ConfigApproval,id'],
+            'approvals.*.order' => ['required', 'integer', 'distinct'],
         ];
     }
 }

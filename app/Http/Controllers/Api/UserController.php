@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\UserFilter;
 use App\Http\Resources\UserResource;
 use App\Http\Validations\UserValidation;
+use App\Mail\User\UserPasswordTemporaryMail;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -89,7 +91,7 @@ class UserController extends Controller
 
         $user->assignRole($request->role_id);
 
-        // kirim password ke email
+        Mail::to($user->email)->send(new UserPasswordTemporaryMail($user, $passwordTemporary));
 
         return $this->responseSuccess($user, 'Add new account');
     }

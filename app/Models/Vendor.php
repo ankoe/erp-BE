@@ -11,7 +11,7 @@ class Vendor extends Model
     use Filterable, HasFactory;
 
     protected $fillable = [
-        'company_id', 'name', 'material_category_id'
+        'company_id', 'name', 'material_category_id', 'email'
     ];
 
     /***********************************************

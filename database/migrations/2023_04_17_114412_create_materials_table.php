@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('uom', 20);
             $table->integer('price');
+            $table->integer('stock')->default(0);
             $table->timestamps();
         });
     }

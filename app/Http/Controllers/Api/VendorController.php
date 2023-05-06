@@ -73,9 +73,10 @@ class VendorController extends Controller
         $user = auth()->user();
 
         $vendor = Vendor::create([
-            'company_id'         => $user->company->id,
-            'name'              => $request->name,
-            'material_category_id'              => $request->material_category_id,
+            'company_id'            => $user->company->id,
+            'name'                  => $request->name,
+            'material_category_id'  => $request->material_category_id,
+            'email'                 => $request->email,
         ]);
 
         return $this->responseSuccess($vendor, 'Add new account');
@@ -96,8 +97,9 @@ class VendorController extends Controller
 
         if ($vendor)
         {
-            $vendor->name                 = $request->name;
-            $vendor->material_category_id                 = $request->material_category_id;
+            $vendor->name                   = $request->name;
+            $vendor->material_category_id   = $request->material_category_id;
+            $vendor->email                  = $request->email;
 
             $vendor->save();
 

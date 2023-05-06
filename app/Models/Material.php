@@ -18,6 +18,7 @@ class Material extends Model
         'description',
         'uom',
         'price',
+        'stock'
     ];
 
     /***********************************************

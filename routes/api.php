@@ -80,11 +80,9 @@ use Illuminate\Support\Facades\Route;
     ->controller(ConfigApprovalController::class)
     ->middleware('auth:api')
     ->group(function () {
-        Route::get('all', 'all');
+        Route::put('sort', 'sort');
         Route::get('/', 'index');
         Route::post('/', 'store');
-        Route::get('{id}', 'show');
-        Route::put('{id}', 'update');
         Route::delete('{id}', 'destroy');
     });
 

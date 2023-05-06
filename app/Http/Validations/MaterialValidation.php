@@ -75,6 +75,7 @@ class MaterialValidation
             'description' => ['required', 'string'],
             'uom' => ['required', 'string', 'max:20'],
             'price' => ['required', 'integer', 'digits_between:0,99999999'],
+            'stock' => ['required', 'integer', 'digits_between:0,99999999'],
         ];
     }
 
@@ -90,6 +91,7 @@ class MaterialValidation
             'description' => ['required', 'string'],
             'uom' => ['required', 'string', 'max:20'],
             'price' => ['required', 'integer', 'digits_between:0,99999999'],
+            'stock' => ['required', 'integer', 'digits_between:0,99999999'],
         ];
     }
 
