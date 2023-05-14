@@ -9,5 +9,6 @@ use BenSampo\Enum\Enum;
  */
 final class RoleProcurementDefault extends Enum
 {
+    const Officer       = 'officer';
     const Supervisor    = 'supervisor';
 }

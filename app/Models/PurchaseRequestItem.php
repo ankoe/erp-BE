@@ -32,9 +32,19 @@ class PurchaseRequestItem extends Model
         return $this->belongsTo(PurchaseRequest::class);
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
     public function material()
     {
         return $this->belongsTo(Material::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
     }
 
     /***********************************************

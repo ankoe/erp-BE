@@ -71,7 +71,7 @@ class UserValidation
         return [
             'name' => ['required', 'max:40'],
             'email' => ['required', 'email:rfc,dns', 'unique:App\Models\User,email'],
-            'mobile' => ['nullable', 'digits_between:11,13', 'unique:App\Models\User,mobile'],
+            'mobile' => ['nullable', 'digits_between:11,13'],
             'role_id' => ['required', 'integer', 'exists:App\Models\Role,id'],
         ];
     }

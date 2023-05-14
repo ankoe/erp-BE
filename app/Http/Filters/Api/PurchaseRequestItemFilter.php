@@ -22,10 +22,10 @@ class PurchaseRequestItemFilter extends Filter
     //     return $this->builder->where('nominal', $nominal);
     // }
 
-    // public function rest($rest): Builder
-    // {
-    //     return $this->builder->where('rest', $rest);
-    // }
+    public function purchase_request_id($purchase_request_id): Builder
+    {
+        return $this->builder->where('purchase_request_id', $purchase_request_id);
+    }
 
     // public function destination_type($destinationType): Builder
     // {

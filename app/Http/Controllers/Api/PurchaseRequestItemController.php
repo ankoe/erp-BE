@@ -78,17 +78,19 @@ class PurchaseRequestItemController extends Controller
 
         $user = auth()->user();
 
+        $file = $request->file('file')->store('public/pr_item');
+
         $purchaseRequestItem = PurchaseRequestItem::create([
-            'purchase_request_id'         => $request->purchase_request_id,
+            'purchase_request_id'   => $request->purchase_request_id,
             'material_id'           => $request->material_id,
-            'price'         => $request->price,
+            'price'                 => $request->price,
             'description'           => $request->description,
-            'quantity'         => $request->quantity,
-            'total'           => $request->total,
-            'vendor_id'         => $request->vendor_id,
-            'branch_id'           => $request->branch_id,
+            'quantity'              => $request->quantity,
+            'total'                 => $request->price * $request->quantity,
+            'vendor_id'             => $request->vendor_id,
+            'branch_id'             => $request->branch_id,
             'expected_at'           => $request->expected_at,
-            'file'           => $request->file,
+            'file'                  => $file,
         ]);
 
         return $this->responseSuccess($purchaseRequestItem, 'Add new account');

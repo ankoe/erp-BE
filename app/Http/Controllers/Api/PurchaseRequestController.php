@@ -7,6 +7,7 @@ use App\Http\Filters\Api\PurchaseRequestFilter;
 use App\Http\Resources\PurchaseRequestResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseRequestStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -72,10 +73,12 @@ class PurchaseRequestController extends Controller
 
         $user = auth()->user();
 
+        $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'draft')->first();
+
         $purchaseRequest = PurchaseRequest::create([
-            'company_id'         => $user->company->id,
-            'user_id'         => $user->id,
-            'status'           => $request->status,
+            'company_id'                    => $user->company->id,
+            'user_id'                       => $user->id,
+            'purchase_request_status_id'    => $purchaseRequestStatus->id,
         ]);
 
         return $this->responseSuccess($purchaseRequest, 'Add new account');

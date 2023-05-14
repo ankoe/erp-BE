@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\RoleGroup;
 use App\Enums\RoleUserDefault;
+use App\Enums\RoleProcurementDefault;
 use App\Http\Controllers\Controller;
 use App\Http\Validations\AuthValidation;
 use App\Mail\Auth\UserRegisterTokenMail;
@@ -149,10 +150,19 @@ class AuthController extends Controller
                 'guard_name'    => 'api'
             ]);
 
-            $procurementSupervisor = Role::create([
-                'name'          => $user->company->id.'_'.RoleGroup::Procurement.'_'.RoleUserDefault::Supervisor,
+            $procurementOfficer = Role::create([
+                'name'          => $user->company->id.'_'.RoleGroup::Procurement.'_'.RoleProcurementDefault::Officer,
                 'company_id'    => $user->company->id,
-                'display_name'  => RoleUserDefault::Supervisor,
+                'display_name'  => RoleProcurementDefault::Officer,
+                'group'         => RoleGroup::Procurement,
+                'is_default'    => true,
+                'guard_name'    => 'api'
+            ]);
+
+            $procurementSupervisor = Role::create([
+                'name'          => $user->company->id.'_'.RoleGroup::Procurement.'_'.RoleProcurementDefault::Supervisor,
+                'company_id'    => $user->company->id,
+                'display_name'  => RoleProcurementDefault::Supervisor,
                 'group'         => RoleGroup::Procurement,
                 'is_default'    => true,
                 'guard_name'    => 'api'
