@@ -2,51 +2,25 @@
 
 namespace App\Models;
 
-use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PurchaseRequestItem extends Model
+class PurchaseRequestApprovalHistory extends Model
 {
-    use Filterable, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'purchase_request_id',
-        'material_id',
-        'price',
-        'description',
-        'quantity',
-        'total',
-        'vendor_id',
-        'branch_id',
-        'expected_at',
-        'file',
-        'is_approve'
+        'user_id',
+        'role_id',
+        'approved_at',
+        'approve_status',
+        'remarks'
     ];
 
     /***********************************************
      *  1. Relation
     ***********************************************/
-
-    public function purchaseRequest()
-    {
-        return $this->belongsTo(PurchaseRequest::class);
-    }
-
-    public function branch()
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
-    public function material()
-    {
-        return $this->belongsTo(Material::class);
-    }
-
-    public function vendor()
-    {
-        return $this->belongsTo(Vendor::class);
-    }
 
     /***********************************************
      *  2. Getter & Setter

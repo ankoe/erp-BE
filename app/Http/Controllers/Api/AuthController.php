@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PermissionType;
 use App\Enums\RoleGroup;
 use App\Enums\RoleUserDefault;
 use App\Enums\RoleProcurementDefault;
@@ -12,6 +13,7 @@ use App\Mail\Auth\UserResetPasswordMail;
 use App\Mail\Auth\UserChangePasswordNotifMail;
 use App\Models\Company;
 use App\Models\ConfigApproval;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Carbon\Carbon;
@@ -46,6 +48,7 @@ class AuthController extends Controller
         }
 
         $profile->image_profile     = $profile->image_profile ? url(Storage::url($profile->image_profile)) : null;
+        $profile->permissions       = $profile->getPermissionsViaRoles()->pluck('name');
         $profile->{'token'}         = $token;
         $profile->{'token_type'}    = 'bearer';
         $profile->{'expires_in'}    = auth()->factory()->getTTL() * 60;
@@ -73,6 +76,22 @@ class AuthController extends Controller
             'is_default'    => true,
             'guard_name'    => 'api'
         ]);
+
+        $adminPermissions = Permission::whereIn('name',
+                                [
+                                    PermissionType::Location,
+                                    PermissionType::ConfigApproval,
+                                    PermissionType::Material,
+                                    PermissionType::MaterialCategory,
+                                    PermissionType::Role,
+                                    PermissionType::User,
+                                    PermissionType::Vendor,
+                                ]
+                                )->get();
+
+        $role->syncPermissions($adminPermissions);
+
+        // ---------------------------------------------------------------
 
         $user = User::create([
             'company_id'    => $company->id,
@@ -132,6 +151,10 @@ class AuthController extends Controller
 
             // Begin create role for company
 
+            $officeUserPermissions = Permission::whereIn('name',
+                                        [ PermissionType::PurchaseRequest ]
+                                        )->get();
+
             $officeUser = Role::create([
                 'name'          => $user->company->id.'_'.RoleGroup::Office.'_'.RoleUserDefault::User,
                 'company_id'    => $user->company->id,
@@ -140,6 +163,14 @@ class AuthController extends Controller
                 'is_default'    => true,
                 'guard_name'    => 'api'
             ]);
+
+            $officeUser->syncPermissions($officeUserPermissions);
+
+            // ---------------------------------------------------------------
+
+            $officeSupervisorPermissions = Permission::whereIn('name',
+                                                [ PermissionType::OfficePurchaseRequest ]
+                                            )->get();
 
             $officeSupervisor = Role::create([
                 'name'          => $user->company->id.'_'.RoleGroup::Office.'_'.RoleUserDefault::Supervisor,
@@ -150,6 +181,18 @@ class AuthController extends Controller
                 'guard_name'    => 'api'
             ]);
 
+            $officeSupervisor->syncPermissions($officeSupervisorPermissions);
+
+            // ---------------------------------------------------------------
+
+            $procurementOfficerPermissions = Permission::whereIn('name',
+                                                [
+                                                    PermissionType::ProcurementPurchaseOrder,
+                                                    PermissionType::ProcurementRFQ,
+                                                    PermissionType::ProcurementPO,
+                                                    PermissionType::ProcurementMessage,
+                                                ])->get();
+
             $procurementOfficer = Role::create([
                 'name'          => $user->company->id.'_'.RoleGroup::Procurement.'_'.RoleProcurementDefault::Officer,
                 'company_id'    => $user->company->id,
@@ -158,6 +201,18 @@ class AuthController extends Controller
                 'is_default'    => true,
                 'guard_name'    => 'api'
             ]);
+
+            $procurementOfficer->syncPermissions($procurementOfficerPermissions);
+
+            // ---------------------------------------------------------------
+
+            $procurementSupervisorPermissions = Permission::whereIn('name',
+                                                    [
+                                                        PermissionType::ProcurementPurchaseOrder,
+                                                        PermissionType::ProcurementRFQ,
+                                                        PermissionType::ProcurementPO,
+                                                        PermissionType::ProcurementMessage,
+                                                    ])->get();
 
             $procurementSupervisor = Role::create([
                 'name'          => $user->company->id.'_'.RoleGroup::Procurement.'_'.RoleProcurementDefault::Supervisor,
@@ -168,7 +223,9 @@ class AuthController extends Controller
                 'guard_name'    => 'api'
             ]);
 
-            foreach([$officeSupervisor, $procurementSupervisor] as $key => $role) {
+            $procurementSupervisor->syncPermissions($procurementSupervisorPermissions);
+
+            foreach([$officeSupervisor, $procurementOfficer] as $key => $role) {
                 ConfigApproval::create([
                     'company_id'    => $user->company->id,
                     'role_id'       => $role->id,

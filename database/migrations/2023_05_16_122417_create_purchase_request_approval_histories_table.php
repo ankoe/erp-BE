@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_request_approvals', function (Blueprint $table) {
+        Schema::create('purchase_request_approval_histories', function (Blueprint $table) {
             $table->id();
             $table->integer('purchase_request_id');
-            $table->integer('order');
             $table->integer('role_id');
-            $table->integer('approve_user_id')->nullable();
-            $table->datetime('approved_at')->nullable();
+            $table->integer('user_id');
+            $table->datetime('approved_at');
+            $table->string('approve_status', 10);
+            $table->string('remarks', 150)->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_request_approvals');
+        Schema::dropIfExists('purchase_request_approval_histories');
     }
 };

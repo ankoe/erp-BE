@@ -12,6 +12,11 @@ use App\Http\Controllers\Api\PurchaseRequestItemController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
+use App\Http\Controllers\Api\Office\PurchaseRequestController as OfficePurchaseRequestController;
+use App\Http\Controllers\Api\Procurement\PurchaseRequestController as ProcurementPurchaseRequestController;
+use App\Http\Controllers\Api\Procurement\RequestForQuotationController as ProcurementRequestForQuotationController;
+use App\Http\Controllers\Api\Procurement\PurchaseOrderController as ProcurementPurchaseOrderController;
+use App\Http\Controllers\Api\Supplier\OfferController as SupplierOfferController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -130,8 +135,8 @@ use Illuminate\Support\Facades\Route;
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::get('{id}', 'show');
-        Route::put('{id}', 'update');
         Route::delete('{id}', 'destroy');
+        Route::get('{id}/apply', 'apply');
     });
 
     Route::prefix('purchase-request-item')
@@ -180,6 +185,76 @@ use Illuminate\Support\Facades\Route;
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'destroy');
+    });
+
+    // -----------------------------------------------------------
+    //                          APROVAL
+    // -----------------------------------------------------------
+
+    Route::prefix('office')
+    ->middleware('auth:api')
+    ->group(function () {
+
+        Route::prefix('purchase-request')
+        ->controller(OfficePurchaseRequestController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('{id}', 'show');
+            Route::post('{id}/approval', 'approval');
+        });
+
+    });
+
+
+    Route::prefix('procurement')
+    ->middleware('auth:api')
+    ->group(function () {
+
+        Route::prefix('purchase-request')
+        ->controller(ProcurementPurchaseRequestController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('{id}', 'show');
+        });
+
+        Route::prefix('request-for-quotation')
+        ->controller(ProcurementRequestForQuotationController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('{id}', 'show');
+        });
+
+        Route::prefix('purchase-order')
+        ->controller(ProcurementPurchaseOrderController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('{id}', 'show');
+        });
+
+    });
+
+
+    Route::prefix('supplier')
+    ->middleware('auth:api')
+    ->group(function () {
+
+        Route::prefix('offer')
+        ->controller(SupplierOfferController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('{id}', 'show');
+        });
+
     });
 
 // });

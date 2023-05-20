@@ -13,6 +13,7 @@ class PurchaseRequest extends Model
     protected $fillable = [
         'company_id',
         'user_id',
+        'code',
         'purchase_request_status_id',
     ];
 
@@ -37,7 +38,7 @@ class PurchaseRequest extends Model
 
     public function purchaseRequestItem()
     {
-        return $this->belongsTo(PurchaseRequestItem::class);
+        return $this->hasMany(PurchaseRequestItem::class);
     }
 
     /***********************************************

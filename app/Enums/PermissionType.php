@@ -15,6 +15,20 @@ final class PermissionType extends Enum
     const Vendor            = 'vendor';
 
     // ---------------------------------------
-    const PurchaseRequestCreate  = 'purchase request create';
-    const PurchaseRequestApprove = 'purchase request approve';
+    const PurchaseRequest   = 'purchase request';
+
+    // ---------------------------------------
+    const OfficePurchaseRequest     = 'office purchase request';
+
+    // ---------------------------------------
+    const ProcurementPurchaseOrder  = 'procurement purchase request';
+    const ProcurementRFQ            = 'procurement rfq';
+    const ProcurementPO             = 'procurement po';
+    const ProcurementMessage        = 'procurement message';
+
+    // ---------------------------------------
+    const VendorOffer               = 'vendor offer';
+
+    // ---------------------------------------
+    const VendorMessage             = 'vendor message';
 }

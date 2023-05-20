@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('company_id');
             $table->integer('user_id');
+            $table->string('code', 15);
             $table->integer('purchase_request_status_id');
             $table->timestamps();
         });

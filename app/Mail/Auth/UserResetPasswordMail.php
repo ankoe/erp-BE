@@ -37,7 +37,7 @@ class UserResetPasswordMail extends Mailable
             ->subject('Reset password akun ERP')
             ->with([
                 'name'          => $this->user->name,
-                'resetLink'     => config('variable.domain.main')."/password-reset?token={$this->user->password_proof_token}",
+                'resetLink'     => config('variable.domain.main')."/auth/password/reset?token={$this->user->password_proof_token}",
             ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\PurchaseRequestItemResource;
 use App\Http\Resources\PurchaseRequestStatusResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -18,9 +19,11 @@ class PurchaseRequestResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'code' => $this->code,
             'user' => new UserResource($this->user),
             'status' => new PurchaseRequestStatusResource($this->PurchaseRequestStatus),
             'total' => $this->purchaseRequestItem()->sum('total'),
+            'items' => PurchaseRequestItemResource::collection($this->purchaseRequestItem),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Validations;
+namespace App\Http\Validations\Office;
 
 use Illuminate\Validation\Rule;
 
@@ -63,38 +63,11 @@ class PurchaseRequestValidation
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function store()
-    {
-        return [
-            // 'label' => ['required', 'string', 'max:30'],
-        ];
-    }
-
 
     /**
      * @return array
      */
-    public static function destroy()
-    {
-        return [
-            // 'order_type' => [
-            //     Rule::in(['asc', 'desc'])
-            // ],
-            // 'order_by' => [
-            //     Rule::in([
-            //     ])
-            // ],
-        ];
-    }
-
-
-    /**
-     * @return array
-     */
-    public static function apply()
+    public static function approval()
     {
         return [
             // 'label' => ['required', 'string', 'max:30'],

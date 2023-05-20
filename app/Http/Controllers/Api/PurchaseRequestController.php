@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\PurchaseRequestFilter;
 use App\Http\Resources\PurchaseRequestResource;
 use App\Http\Validations\PurchaseRequestValidation;
+use App\Models\ConfigApproval;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseRequestApproval;
 use App\Models\PurchaseRequestStatus;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PurchaseRequestController extends Controller
@@ -78,35 +82,11 @@ class PurchaseRequestController extends Controller
         $purchaseRequest = PurchaseRequest::create([
             'company_id'                    => $user->company->id,
             'user_id'                       => $user->id,
+            'code'                          => 'PR001',
             'purchase_request_status_id'    => $purchaseRequestStatus->id,
         ]);
 
         return $this->responseSuccess($purchaseRequest, 'Add new account');
-    }
-
-
-    public function update(Request $request, $id)
-    {
-        $request['id'] = $id;
-
-        $validated = Validator::make($request->all(), PurchaseRequestValidation::update());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
-        {
-            $purchaseRequest->status     = $request->status;
-
-            $purchaseRequest->save();
-
-            return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Update detail');
-        }
-
-        return $this->responseError([], 'Not found');
     }
 
 
@@ -128,6 +108,81 @@ class PurchaseRequestController extends Controller
             $purchaseRequest->delete();
 
             return $this->responseSuccess($purchaseRequest, 'Delete Record', 204);
+        }
+
+        return $this->responseError([], 'Not found');
+    }
+
+
+    public function apply($id)
+    {
+
+        $validated = Validator::make(['id' => $id], PurchaseRequestValidation::apply());
+
+        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
+
+        $user = auth()->user();
+
+        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+
+        $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting office approval')->first();
+
+        if ($purchaseRequest)
+        {
+
+            DB::beginTransaction();
+
+            try {
+
+                $purchaseRequest->purchase_request_status_id     = $purchaseRequestStatus->id;
+
+                $purchaseRequest->save();
+
+                $configApprovals = ConfigApproval::where('company_id', $user->company->id)->orderBy('order')->get();
+
+                $firstRoleId = null;
+
+                $bulkPurchaseRequestApproval = array();
+
+                foreach ($configApprovals as $configApproval) {
+
+                    if ($configApproval->order == 1) $firstRoleId = $configApproval->role_id;
+
+                    array_push($bulkPurchaseRequestApproval, [
+                        'purchase_request_id'   => $purchaseRequest->id,
+                        'order'                 => $configApproval->order,
+                        'role_id'               => $configApproval->role_id
+                    ]);
+                }
+
+                PurchaseRequestApproval::insert($bulkPurchaseRequestApproval);
+
+                // notifikasi belum jadi
+
+                // $users = User::where('company_id', $user->company->id)->where('role_id', $firstRoleId)->get();
+
+                // $bulkNotification = array();
+
+                // foreach ($users as $user) {
+
+                //     array_push($bulkPurchaseRequestApproval, [
+                //         'order'     => $configApproval->order,
+                //         'role_id'   => $configApproval->role_id
+                //     ]);
+                // }
+
+                // Notification::insert($bulkNotification);
+
+                DB::commit();
+
+                return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Update detail');
+
+            } catch(\Throwable $e) {
+
+                DB::rollback();
+
+                return $this->responseError([], $e->getMessage());
+            }
         }
 
         return $this->responseError([], 'Not found');

@@ -38,7 +38,7 @@ class UserRegisterTokenMail extends Mailable
             ->with([
                 'name'          => $this->user->name,
                 'limit'         => config('variable.limit.token'),
-                'confirmLink'   => config('variable.domain.main')."/confirmation?token={$this->user->email_proof_token}",
+                'confirmLink'   => config('variable.domain.main')."/auth/activation/confirmation?token={$this->user->email_proof_token}",
             ]);
     }
 }
