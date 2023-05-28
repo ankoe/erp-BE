@@ -56,7 +56,7 @@ class VendorController extends Controller
 
         if ($vendor)
         {
-            return $this->responseSuccess(new VendorResource($vendor), 'Get detail');
+            return $this->responseSuccess(new VendorResource($vendor), 'Get vendor detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -79,7 +79,7 @@ class VendorController extends Controller
             'email'                 => $request->email,
         ]);
 
-        return $this->responseSuccess($vendor, 'Add new account');
+        return $this->responseSuccess($vendor, 'Add new vendor');
     }
 
 
@@ -103,7 +103,7 @@ class VendorController extends Controller
 
             $vendor->save();
 
-            return $this->responseSuccess(new VendorResource($vendor), 'Update detail');
+            return $this->responseSuccess(new VendorResource($vendor), 'Update vendor');
         }
 
         return $this->responseError([], 'Not found');
@@ -127,7 +127,7 @@ class VendorController extends Controller
 
             $vendor->delete();
 
-            return $this->responseSuccess($vendor, 'Delete Record', 204);
+            return $this->responseSuccess($vendor, 'Delete vendor', 204);
         }
 
         return $this->responseError([], 'Not found');

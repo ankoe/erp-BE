@@ -11,6 +11,7 @@ use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestApproval;
 use App\Models\PurchaseRequestStatus;
 use App\Models\User;
+use App\Services\Notification as ServiceNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -61,7 +62,7 @@ class PurchaseRequestController extends Controller
 
         if ($purchaseRequest)
         {
-            return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Get detail');
+            return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Get purchase request detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -82,11 +83,11 @@ class PurchaseRequestController extends Controller
         $purchaseRequest = PurchaseRequest::create([
             'company_id'                    => $user->company->id,
             'user_id'                       => $user->id,
-            'code'                          => 'PR001',
+            'code'                          => PurchaseRequest::generateDocumentNumber(),
             'purchase_request_status_id'    => $purchaseRequestStatus->id,
         ]);
 
-        return $this->responseSuccess($purchaseRequest, 'Add new account');
+        return $this->responseSuccess($purchaseRequest, 'Create new purchase request');
     }
 
 
@@ -107,7 +108,7 @@ class PurchaseRequestController extends Controller
 
             $purchaseRequest->delete();
 
-            return $this->responseSuccess($purchaseRequest, 'Delete Record', 204);
+            return $this->responseSuccess($purchaseRequest, 'Delete purchase request', 204);
         }
 
         return $this->responseError([], 'Not found');
@@ -116,7 +117,6 @@ class PurchaseRequestController extends Controller
 
     public function apply($id)
     {
-
         $validated = Validator::make(['id' => $id], PurchaseRequestValidation::apply());
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
@@ -129,7 +129,6 @@ class PurchaseRequestController extends Controller
 
         if ($purchaseRequest)
         {
-
             DB::beginTransaction();
 
             try {
@@ -157,25 +156,23 @@ class PurchaseRequestController extends Controller
 
                 PurchaseRequestApproval::insert($bulkPurchaseRequestApproval);
 
-                // notifikasi belum jadi
+                // send Notification
+                $users = User::where('company_id', $user->company->id)
+                                ->whereHas('roles', function($query) use ($firstRoleId) {
+                                    $query->where("id", $firstRoleId);
+                                })
+                                ->get();
 
-                // $users = User::where('company_id', $user->company->id)->where('role_id', $firstRoleId)->get();
-
-                // $bulkNotification = array();
-
-                // foreach ($users as $user) {
-
-                //     array_push($bulkPurchaseRequestApproval, [
-                //         'order'     => $configApproval->order,
-                //         'role_id'   => $configApproval->role_id
-                //     ]);
-                // }
-
-                // Notification::insert($bulkNotification);
+                (new ServiceNotification($users))->action(
+                    'Need PR Approval',
+                    'office-purchase-request-detail',
+                    [ 'id' => $purchaseRequest->id ],
+                    $purchaseRequest->code . ' waiting for approve'
+                );
 
                 DB::commit();
 
-                return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Update detail');
+                return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Purchase request submitted');
 
             } catch(\Throwable $e) {
 

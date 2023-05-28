@@ -20,7 +20,10 @@ class NotificationController extends Controller
 
         $user = auth()->user();
 
-        $notifications = Notification::filter(new NotificationFilter($request))->where('user_id', $user->id)->paginate($request->input('per_page', 10));
+        $notifications = Notification::filter(new NotificationFilter($request))
+                            ->where('user_id', $user->id)
+                            ->orderBy('created_at', 'DESC')
+                            ->paginate($request->input('per_page', 10));
 
         return NotificationResource::collection($notifications);
     }
@@ -35,101 +38,38 @@ class NotificationController extends Controller
         $user = auth()->user();
 
         // Perlu diseragamkan return responsenya
-        $notifications = Notification::filter(new NotificationFilter($request))->where('user_id', $user->id)->get();
+        $notifications = Notification::filter(new NotificationFilter($request))
+                            ->where('user_id', $user->id)
+                            ->orderBy('created_at', 'DESC')
+                            ->get();
 
         return NotificationResource::collection($notifications);
     }
 
 
-    public function show(Request $request, $id)
+    public function count(Request $request)
     {
+        $count = Notification::where('user_id', auth()->user()->id)
+                            ->where('is_read', false)
+                            ->count();
 
-        $request['id'] = $id;
-
-        $validated = Validator::make($request->all(), NotificationValidation::show());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $notification = Notification::where(['id' => $id, 'user_id' => $user->id])->first();
-
-        if ($notification)
-        {
-            return $this->responseSuccess(new NotificationResource($notification), 'Get detail');
-        }
-
-        return $this->responseError([], 'Not found');
+        return $this->responseSuccess($count);
     }
 
-
-    public function store(Request $request)
+    public function readAll(Request $request)
     {
+        $notifications = Notification::where('user_id', auth()->user()->id)
+                            ->update(['is_read' => true]);
 
-        $validated = Validator::make($request->all(), NotificationValidation::store());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $notification = Notification::Create([
-            'user_id'         => $user->id,
-            'title'           => $request->title,
-            'content'           => $request->content,
-            'is_read'           => false,
-        ]);
-
-        return $this->responseSuccess($notification, 'Add new account');
+        return $this->responseSuccess($notifications);
     }
 
-
-    public function update(Request $request, $id)
+    public function readSingle(Request $request, $id)
     {
-        $request['id'] = $id;
+        $notifications = Notification::where('user_id', auth()->user()->id)
+                            ->where('id', $id)
+                            ->update(['is_read' => true]);
 
-        $validated = Validator::make($request->all(), NotificationValidation::update());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $notification = Notification::where(['id' => $id, 'user_id' => $user->id])->first();
-
-        if ($notification)
-        {
-            $notification->title    = $request->title;
-            $notification->content    = $request->content;
-            $notification->is_read    = $request->is_read;
-
-            $notification->save();
-
-            return $this->responseSuccess(new NotificationResource($notification), 'Update detail');
-        }
-
-        return $this->responseError([], 'Not found');
-    }
-
-
-    public function destroy($id)
-    {
-
-        $validated = Validator::make(['id' => $id], NotificationValidation::destroy());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $notification = Notification::where(['id' => $id, 'user_id' => $user->id])->first();
-
-        if ($notification)
-        {
-            // income dijadikan null atau di ubah ke kategori lainnya
-
-            $notification->delete();
-
-            return $this->responseSuccess($notification, 'Delete Record', 204);
-        }
-
-        return $this->responseError([], 'Not found');
+        return $this->responseSuccess($notifications);
     }
 }

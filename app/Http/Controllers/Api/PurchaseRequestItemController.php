@@ -62,7 +62,7 @@ class PurchaseRequestItemController extends Controller
 
         if ($purchaseRequestItem)
         {
-            return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequestItem), 'Get detail');
+            return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequestItem), 'Get purchase request item detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -93,7 +93,7 @@ class PurchaseRequestItemController extends Controller
             'file'                  => $file,
         ]);
 
-        return $this->responseSuccess($purchaseRequestItem, 'Add new account');
+        return $this->responseSuccess($purchaseRequestItem, 'Add new purchase request item');
     }
 
 
@@ -125,7 +125,7 @@ class PurchaseRequestItemController extends Controller
 
             $purchaseRequestItem->save();
 
-            return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequestItem), 'Update detail');
+            return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequestItem), 'Update purchase request item');
         }
 
         return $this->responseError([], 'Not found');
@@ -150,7 +150,7 @@ class PurchaseRequestItemController extends Controller
 
             $purchaseRequestItem->delete();
 
-            return $this->responseSuccess($purchaseRequestItem, 'Delete Record', 204);
+            return $this->responseSuccess($purchaseRequestItem, 'Delete purchase request item', 204);
         }
 
         return $this->responseError([], 'Not found');

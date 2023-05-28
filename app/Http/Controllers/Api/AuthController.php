@@ -225,7 +225,7 @@ class AuthController extends Controller
 
             $procurementSupervisor->syncPermissions($procurementSupervisorPermissions);
 
-            foreach([$officeSupervisor, $procurementOfficer] as $key => $role) {
+            foreach([$officeSupervisor, $procurementSupervisor] as $key => $role) {
                 ConfigApproval::create([
                     'company_id'    => $user->company->id,
                     'role_id'       => $role->id,

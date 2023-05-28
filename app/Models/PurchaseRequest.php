@@ -52,4 +52,24 @@ class PurchaseRequest extends Model
     /***********************************************
      *  4. Function
     ***********************************************/
+
+    public static function generateDocumentNumber()
+    {
+        $company_id = auth()->user()->company->id;
+        $month = date('m');
+        $year = date('Y');
+
+        $count = self::where('company_id', $company_id)
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->count();
+
+        // Mendapatkan nomor urut dokumen
+        $documentNumber = $count ? ($count + 1) : 1;
+
+        // Format nomor dokumen dengan menambahkan bulan dan tahun
+        $documentNumber = 'PR' . $year . '-' . $month . '-' . str_pad($documentNumber, 4, '0', STR_PAD_LEFT);
+
+        return $documentNumber;
+    }
 }

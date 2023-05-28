@@ -65,7 +65,7 @@ class ConfigApprovalValidation
     {
         return [
             'approvals' => ['required', 'array'],
-            'approvals.*.id' => ['required', 'integer', 'distinct', 'exists:App\Models\ConfigApproval,id'],
+            'approvals.*.role_id' => ['required', 'integer', 'distinct', 'exists:App\Models\Role,id'],
             'approvals.*.order' => ['required', 'integer', 'distinct'],
         ];
     }

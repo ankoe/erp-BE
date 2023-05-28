@@ -56,7 +56,7 @@ class BranchController extends Controller
 
         if ($branch)
         {
-            return $this->responseSuccess(new BranchResource($branch), 'Get detail');
+            return $this->responseSuccess(new BranchResource($branch), 'Get location detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -105,7 +105,7 @@ class BranchController extends Controller
 
             $branch->save();
 
-            return $this->responseSuccess(new BranchResource($branch), 'Update detail');
+            return $this->responseSuccess(new BranchResource($branch), 'Update location');
         }
 
         return $this->responseError([], 'Not found');
@@ -128,7 +128,7 @@ class BranchController extends Controller
 
             $branch->delete();
 
-            return $this->responseSuccess($branch, 'Delete Record', 204);
+            return $this->responseSuccess($branch, 'Delete location', 204);
         }
 
         return $this->responseError([], 'Not found');

@@ -82,7 +82,7 @@ class ProfileController extends Controller
 
             Mail::to($user->email)->send(new UserChangePasswordNotifMail($user));
 
-            return $this->responseSuccess($user, 'Update record');
+            return $this->responseSuccess($user, 'Update password');
         }
 
         return $this->responseError([], 'Not found');

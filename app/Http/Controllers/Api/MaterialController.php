@@ -56,7 +56,7 @@ class MaterialController extends Controller
 
         if ($material)
         {
-            return $this->responseSuccess(new MaterialResource($material), 'Get detail');
+            return $this->responseSuccess(new MaterialResource($material), 'Get material detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -83,7 +83,7 @@ class MaterialController extends Controller
             'stock'                 => $request->stock,
         ]);
 
-        return $this->responseSuccess($material, 'Add new account');
+        return $this->responseSuccess($material, 'Add new material');
     }
 
 
@@ -111,7 +111,7 @@ class MaterialController extends Controller
 
             $material->save();
 
-            return $this->responseSuccess(new MaterialResource($material), 'Update detail');
+            return $this->responseSuccess(new MaterialResource($material), 'Update material');
         }
 
         return $this->responseError([], 'Not found');
@@ -135,7 +135,7 @@ class MaterialController extends Controller
 
             $material->delete();
 
-            return $this->responseSuccess($material, 'Delete Record', 204);
+            return $this->responseSuccess($material, 'Delete material', 204);
         }
 
         return $this->responseError([], 'Not found');

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RoleGroup;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\RoleFilter;
 use App\Http\Resources\RoleResource;
 use App\Http\Validations\RoleValidation;
+use App\Models\Permission;
 use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -57,7 +59,7 @@ class RoleController extends Controller
 
         if ($role)
         {
-            return $this->responseSuccess(new RoleResource($role), 'Get detail');
+            return $this->responseSuccess(new RoleResource($role), 'Get role detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -81,9 +83,26 @@ class RoleController extends Controller
             'guard_name'    => 'api'
         ]);
 
-        // kirim password ke email
+        $permissions = null;
 
-        return $this->responseSuccess($role, 'Add new account');
+        if ($request->group == RoleGroup::Office) {
+            $permissions = Permission::whereIn('name',
+                                                [ PermissionType::OfficePurchaseRequest ]
+                                            )->get();
+
+        } else {
+            $permissions = Permission::whereIn('name',
+                            [
+                                PermissionType::ProcurementPurchaseOrder,
+                                PermissionType::ProcurementRFQ,
+                                PermissionType::ProcurementPO,
+                                PermissionType::ProcurementMessage,
+                            ])->get();
+        }
+
+        $role->syncPermissions($permissions);
+
+        return $this->responseSuccess($role, 'Create new role');
     }
 
 
@@ -104,12 +123,31 @@ class RoleController extends Controller
             if ($role->is_default) return $this->responseError([], 'Peran default tidak bisa diubah');
 
             $role->name             = $user->company->id.'_'.$request->group.'_'.str_replace(' ','-', $request->name);
-            $role->display_name    = $request->name;
-            $role->group    = $request->group;
+            $role->display_name     = $request->name;
+            $role->group            = $request->group;
 
             $role->save();
 
-            return $this->responseSuccess(new RoleResource($role), 'Update detail');
+            $permissions = null;
+
+            if ($request->group == RoleGroup::Office) {
+                $permissions = Permission::whereIn('name',
+                                                    [ PermissionType::OfficePurchaseRequest ]
+                                                )->get();
+
+            } else {
+                $permissions = Permission::whereIn('name',
+                                [
+                                    PermissionType::ProcurementPurchaseOrder,
+                                    PermissionType::ProcurementRFQ,
+                                    PermissionType::ProcurementPO,
+                                    PermissionType::ProcurementMessage,
+                                ])->get();
+            }
+
+            $role->syncPermissions($permissions);
+
+            return $this->responseSuccess(new RoleResource($role), 'Update role');
         }
 
         return $this->responseError([], 'Not found');
@@ -133,7 +171,7 @@ class RoleController extends Controller
 
             $role->delete();
 
-            return $this->responseSuccess($role, 'Delete Record', 204);
+            return $this->responseSuccess($role, 'Delete role', 204);
         }
 
         return $this->responseError([], 'Not found');

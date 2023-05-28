@@ -77,17 +77,23 @@ class ConfigApprovalController extends Controller
 
         $user = auth()->user();
 
-        foreach ($request->approvals as $approval) {
-            $configApproval = ConfigApproval::where('company_id', $user->company->id)
-                                ->where('id', $approval['id'])
-                                ->first();
+        $arrayApprovalId = [];
 
-            if ($configApproval)
-            {
-                $configApproval->order      = $approval['order'];
-                $configApproval->save();
-            }
+        foreach ($request->approvals as $approval) {
+            $configApproval = ConfigApproval::updateOrCreate(
+                                [
+                                    'company_id'    =>  $user->company->id,
+                                    'role_id'       =>  $approval['role_id']
+                                ],
+                                [
+                                    'order'     => $approval['order']
+                                ]
+                            );
+
+            array_push($arrayApprovalId, $configApproval->id);
         }
+
+        ConfigApproval::where('company_id', $user->company_id)->whereNotIn('id', $arrayApprovalId)->delete();
 
         return $this->responseSuccess([], 'sort success');
     }

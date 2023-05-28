@@ -61,7 +61,7 @@ class UserController extends Controller
 
         if ($user)
         {
-            return $this->responseSuccess(new UserResource($user), 'Get detail');
+            return $this->responseSuccess(new UserResource($user), 'Get user detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -93,7 +93,7 @@ class UserController extends Controller
 
         Mail::to($user->email)->send(new UserPasswordTemporaryMail($user, $passwordTemporary));
 
-        return $this->responseSuccess($user, 'Add new account');
+        return $this->responseSuccess($user, 'Add new user');
     }
 
 
@@ -120,7 +120,7 @@ class UserController extends Controller
 
             $user->syncRoles($request->role_id);
 
-            return $this->responseSuccess(new UserResource($user), 'Update detail');
+            return $this->responseSuccess(new UserResource($user), 'Update user');
         }
 
         return $this->responseError([], 'Not found');
@@ -144,7 +144,7 @@ class UserController extends Controller
 
             $user->delete();
 
-            return $this->responseSuccess($user, 'Delete Record', 204);
+            return $this->responseSuccess($user, 'Delete user', 204);
         }
 
         return $this->responseError([], 'Not found');

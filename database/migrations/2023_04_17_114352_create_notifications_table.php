@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id');
             $table->string('title', 50);
-            $table->string('content', 200);
+            $table->string('type', 30);
+            $table->string('message', 200);
+            $table->string('route', 500)->nullable();
+            $table->json('route_param')->nullable();
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });

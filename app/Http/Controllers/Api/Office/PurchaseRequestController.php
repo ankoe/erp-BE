@@ -12,6 +12,7 @@ use App\Models\PurchaseRequestApproval;
 use App\Models\PurchaseRequestApprovalHistory;
 use App\Models\PurchaseRequestStatus;
 use App\Models\User;
+use App\Services\Notification as ServiceNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -115,6 +116,13 @@ class PurchaseRequestController extends Controller
 
                     $purchaseRequestApproval->save();
 
+                    // notif
+                    (new ServiceNotification([$purchaseRequest->user]))->action(
+                        'PR Approved',
+                        'purchase-request-detail',
+                        [ 'id' => $purchaseRequest->id ],
+                        $purchaseRequest->code . ' approved by ' . $user->name
+                    );
 
                 } else {
 
@@ -125,6 +133,15 @@ class PurchaseRequestController extends Controller
                                                         'approved_at'           => null,
                                                         'approve_user_id'       => null,
                                                     ]);
+
+                    // notif
+                    (new ServiceNotification([$purchaseRequest->user]))->action(
+                        'PR Rejected',
+                        'purchase-request-detail',
+                        [ 'id' => $purchaseRequest->id ],
+                        $purchaseRequest->code . ' rejected by' . $user->name
+                    );
+
                 }
 
                 $purchaseRequestStatus = PurchaseRequestStatus::where('title', $statusTitle)->first();

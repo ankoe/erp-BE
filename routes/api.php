@@ -121,10 +121,9 @@ use Illuminate\Support\Facades\Route;
     ->group(function () {
         Route::get('all', 'all');
         Route::get('/', 'index');
-        Route::post('/', 'store');
-        Route::get('{id}', 'show');
-        Route::put('{id}', 'update');
-        Route::delete('{id}', 'destroy');
+        Route::get('count', 'count');
+        Route::get('read', 'readAll');
+        Route::get('read/{id}', 'readSingle');
     });
 
     Route::prefix('purchase-request')

@@ -56,7 +56,7 @@ class MaterialCategoryController extends Controller
 
         if ($materialCategory)
         {
-            return $this->responseSuccess(new MaterialCategoryResource($materialCategory), 'Get detail');
+            return $this->responseSuccess(new MaterialCategoryResource($materialCategory), 'Get material location detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -77,7 +77,7 @@ class MaterialCategoryController extends Controller
             'name'           => $request->name,
         ]);
 
-        return $this->responseSuccess($materialCategory, 'Add new account');
+        return $this->responseSuccess($materialCategory, 'Add new material category');
     }
 
 
@@ -99,7 +99,7 @@ class MaterialCategoryController extends Controller
 
             $materialCategory->save();
 
-            return $this->responseSuccess(new MaterialCategoryResource($materialCategory), 'Update detail');
+            return $this->responseSuccess(new MaterialCategoryResource($materialCategory), 'Update material category');
         }
 
         return $this->responseError([], 'Not found');
@@ -123,7 +123,7 @@ class MaterialCategoryController extends Controller
 
             $materialCategory->delete();
 
-            return $this->responseSuccess($materialCategory, 'Delete Record', 204);
+            return $this->responseSuccess($materialCategory, 'Delete material category', 204);
         }
 
         return $this->responseError([], 'Not found');

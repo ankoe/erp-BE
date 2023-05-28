@@ -13,8 +13,15 @@ class Notification extends Model
     protected $fillable = [
         'user_id',
         'title',
-        'content',
+        'type',
+        'message',
+        'route',
+        'route_param',
         'is_read',
+    ];
+
+    protected $casts = [
+        'route_param' => 'array',
     ];
 
     /***********************************************
