@@ -49,6 +49,28 @@ return [
             'transport' => 'ses',
         ],
 
+        'mailjet' => [
+            'key' => env('MAIL_USERNAME'),
+            'secret' => env('MAIL_PASSWORD'),
+            'transactional' => [
+                'call' => true,
+                'options' => [
+                    'url' => 'api.mailjet.com',
+                    'version' => 'v3.1',
+                    'call' => true,
+                    'secured' => true
+                ]
+            ],
+            'common' => [
+                'call' => true,
+                'options' => [
+                    'url' => 'api.mailjet.com',
+                    'version' => 'v3',
+                    'call' => true,
+                    'secured' => true
+                ]
+            ]
+        ],
         'mailgun' => [
             'transport' => 'mailgun',
             // 'client' => [

@@ -32,9 +32,8 @@ class UserChangePasswordNotifMail extends Mailable
     public function build()
     {
         return $this
-            ->from('noreply@erp.com')
             ->view('mail.auth.password.change')
-            ->subject('Notifikasi ganti password ERP')
+            ->subject('Notifikasi ganti password p2p.haricar.com')
             ->with([
                 'browser'           => '',
                 'operatingSystem'   => '',

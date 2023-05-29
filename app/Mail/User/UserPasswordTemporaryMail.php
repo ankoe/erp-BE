@@ -34,9 +34,8 @@ class UserPasswordTemporaryMail extends Mailable
     public function build()
     {
         return $this
-            ->from('noreply@erp.com')
             ->view('mail.user.password_temporary')
-            ->subject('Temporary Password login erp.com')
+            ->subject('Temporary Password login p2p.haricar.com')
             ->with([
                 'name'          => $this->user->name,
                 'email'         => $this->user->email,

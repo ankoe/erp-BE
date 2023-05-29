@@ -32,9 +32,8 @@ class UserResetPasswordMail extends Mailable
     public function build()
     {
         return $this
-            ->from('noreply@erp.com')
             ->view('mail.auth.password.reset')
-            ->subject('Reset password akun ERP')
+            ->subject('Reset password akun p2p.haricar.com')
             ->with([
                 'name'          => $this->user->name,
                 'resetLink'     => config('variable.domain.main')."/auth/password/reset?token={$this->user->password_proof_token}",

@@ -32,9 +32,8 @@ class UserRegisterTokenMail extends Mailable
     public function build()
     {
         return $this
-            ->from('noreply@erp.com')
             ->view('mail.auth.activate.token')
-            ->subject('Konfirmasi akun ERP')
+            ->subject('Konfirmasi akun p2p.haricar.com')
             ->with([
                 'name'          => $this->user->name,
                 'limit'         => config('variable.limit.token'),
