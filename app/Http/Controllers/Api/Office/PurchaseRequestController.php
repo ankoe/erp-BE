@@ -105,7 +105,7 @@ class PurchaseRequestController extends Controller
 
                 if ($request->decision == 'approve') {
 
-                    $statusTitle = 'waiting procurement approval';
+                    $statusTitle = 'waiting procurement approval'; // jika tidak ada supervisor lagi, titlenya ini
 
                     $purchaseRequestApproval = PurchaseRequestApproval::where('purchase_request_id', $purchaseRequest->id)
                                                     ->where('role_id', $roleId)
@@ -123,6 +123,8 @@ class PurchaseRequestController extends Controller
                         [ 'id' => $purchaseRequest->id ],
                         $purchaseRequest->code . ' approved by ' . $user->name
                     );
+
+                    // send ke office supervisor selanjutnya atau send ke procurement officer
 
                 } else {
 
@@ -158,8 +160,6 @@ class PurchaseRequestController extends Controller
                     'approve_status'        => $request->decision,
                     'remarks'               => $request->remarks,
                 ]);
-
-                // notifikasi
 
                 DB::commit();
 

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('branch_id');
             $table->date('expected_at');
             $table->string('file', 100);
-            $table->boolean('is_approve')->default(false);
+            $table->boolean('is_approve')->nullable();
             $table->timestamps();
         });
     }

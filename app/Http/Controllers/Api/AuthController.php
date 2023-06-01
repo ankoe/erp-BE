@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -38,7 +39,7 @@ class AuthController extends Controller
                 'is_active' => true
             ])
         ) {
-            return $this->responseError([], 'Unauthorized');
+            return $this->responseError([], 'Unauthorized', 201);
         }
 
         $profile = auth()->user();
@@ -301,13 +302,31 @@ class AuthController extends Controller
 
     public function refresh()
     {
+        try {
+            $token = auth()->refresh();
+        } catch (JWTException $e) {
+            return $this->responseError([], 'Failed get new token', 401);
+        }
+
         $data = array(
-            'token'         => auth()->refresh(),
+            'token'         => $token,
             'token_type'    => 'bearer',
             'expires_in'    => auth()->factory()->getTTL() * 60
         );
 
         return $this->responseSuccess($data, 'New token created');
+    }
+
+
+    public function logout()
+    {
+        try {
+            auth()->logout();
+        } catch (JWTException $e) {
+            return $this->responseSuccess([], 'logout successfully');
+        }
+
+        return $this->responseSuccess([], 'logout successfully');
     }
 
 

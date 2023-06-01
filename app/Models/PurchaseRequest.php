@@ -41,6 +41,16 @@ class PurchaseRequest extends Model
         return $this->hasMany(PurchaseRequestItem::class);
     }
 
+    public function purchaseRequestItemApprove()
+    {
+        return $this->hasMany(PurchaseRequestItem::class)->where('is_approve', true);
+    }
+
+    public function purchaseRequestItemReject()
+    {
+        return $this->hasMany(PurchaseRequestItem::class)->where('is_approve', false);
+    }
+
     /***********************************************
      *  2. Getter & Setter
     ***********************************************/

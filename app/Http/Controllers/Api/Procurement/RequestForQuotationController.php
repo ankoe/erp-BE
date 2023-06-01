@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\PurchaseRequestFilter;
-use App\Http\Resources\PurchaseRequestResource;
+use App\Http\Resources\RequestForQuotationResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Models\ConfigApproval;
 use App\Models\PurchaseRequest;
@@ -33,7 +33,7 @@ class RequestForQuotationController extends Controller
                                 })
                                 ->paginate($request->input('per_page', 10));
 
-        return PurchaseRequestResource::collection($purchaseRequests);
+        return RequestForQuotationResource::collection($purchaseRequests);
     }
 
 
@@ -53,7 +53,7 @@ class RequestForQuotationController extends Controller
                                 ->where('company_id', $user->company->id)
                                 ->get();
 
-        return PurchaseRequestResource::collection($purchaseRequests);
+        return RequestForQuotationResource::collection($purchaseRequests);
     }
 
 
@@ -72,7 +72,7 @@ class RequestForQuotationController extends Controller
 
         if ($purchaseRequest)
         {
-            return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Get detail');
+            return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'Get detail');
         }
 
         return $this->responseError([], 'Not found');

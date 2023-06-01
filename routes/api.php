@@ -42,7 +42,8 @@ use Illuminate\Support\Facades\Route;
         Route::get('activation/resend', 'activationResend');
         Route::get('password/forgot', 'passwordForgot');
         Route::post('password/reset', 'passwordReset');
-        Route::get('refresh', 'refresh')->middleware('auth:api');
+        Route::get('refresh', 'refresh');
+        Route::get('logout', 'logout');
     });
 
     Route::prefix('profile')
@@ -216,8 +217,8 @@ use Illuminate\Support\Facades\Route;
         ->group(function () {
             Route::get('all', 'all');
             Route::get('/', 'index');
-            Route::post('/', 'store');
             Route::get('{id}', 'show');
+            Route::post('{id}/approval', 'approval');
         });
 
         Route::prefix('request-for-quotation')
