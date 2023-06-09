@@ -1,7 +1,7 @@
 <p>
 Hai {{ $name }},
 <br>
-Anda telah didaftarkan di website erp.com pada tanggal {{ $createdAt }}, dengan detail sebagai berikut:
+Anda telah didaftarkan di website p2p.haricar.com pada tanggal {{ $createdAt }}, dengan detail sebagai berikut:
 </p>
 <ul>
 <li>Perusahaan: <strong>{{ $company }}</strong></li>

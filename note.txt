@@ -9,3 +9,11 @@ opsi (tambah sendiri)
 ---------------- procurement
 - supervisor (1 orang tiap role) ->default
 - tambah role + usernya siapa (1 orang tiap role)
+
+
+
+- validasi role jika nama sama belum ke catch
+- tanda waktu diatas supervisor statis dari waktu user submit
+- jika propose supervisor reject kembali memilih vendor
+- saat usulan vendor disamping terdapat pemilihan kolom incoterm
+- di po detail isinya incoterm tujuan, vendor, harga yg vendor sudah setujui

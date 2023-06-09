@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Http\Resources\BranchResource;
 use App\Http\Resources\MaterialResource;
+use App\Http\Resources\RequestQuotationResource;
 use App\Http\Resources\VendorResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -30,6 +31,9 @@ class PurchaseRequestItemResource extends JsonResource
             "branch"                => new BranchResource($this->branch),
             "expected_at"           => $this->expected_at,
             "file"                  => url(Storage::url($this->file)),
+            "is_approve"            => $this->is_approve,
+            "remarks"               => $this->remarks,
+            "request_quotation"     => RequestQuotationResource::collection($this->requestQuotation),
             "created_at"            => $this->created_at,
             "updated_at"            => $this->updated_at
         ];

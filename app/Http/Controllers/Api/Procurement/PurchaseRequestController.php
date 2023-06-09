@@ -8,6 +8,7 @@ use App\Http\Resources\PurchaseRequestResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Models\ConfigApproval;
 use App\Models\PurchaseRequest;
+use App\Models\PurchaseRequestApproval;
 use App\Models\PurchaseRequestItem;
 use App\Models\PurchaseRequestStatus;
 use App\Models\User;
@@ -47,10 +48,10 @@ class PurchaseRequestController extends Controller
 
         // Perlu diseragamkan return responsenya
         $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
+                                ->where('company_id', $user->company->id)
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->whereNot('title', 'draft');
                                 })
-                                ->where('company_id', $user->company->id)
                                 ->get();
 
         return PurchaseRequestResource::collection($purchaseRequests);
@@ -97,17 +98,71 @@ class PurchaseRequestController extends Controller
 
             try {
 
-                PurchaseRequestItem::where('purchase_request_id', $purchaseRequest->id)
-                                        ->whereIn('id', $request->approve)
-                                        ->update(['is_approve' => true]);
+                $statusTitle = null;
 
-                PurchaseRequestItem::where('purchase_request_id', $purchaseRequest->id)
-                                        ->whereIn('id', $request->reject)
-                                        ->update(['is_approve' => false]);
+                $allApprove = true;
 
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq response')->first();
+                foreach ($request->items as $item)
+                {
+                    $isApprove = $item['decision'] == 'approve';
 
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
+                    if (!$isApprove) $allApprove = false;
+
+                    $purchaseRequestItem = PurchaseRequestItem::where('purchase_request_id', $purchaseRequest->id)
+                                        ->where('id', $item['id'])
+                                        ->update([
+                                            'is_approve'    => $isApprove,
+                                            'remarks'       => $item['remarks'],
+                                        ]);
+                }
+
+                if ($allApprove) {
+
+                    $statusTitle = 'waiting rfq response';
+
+                    // $purchaseRequestApproval = PurchaseRequestApproval::where('purchase_request_id', $purchaseRequest->id)
+                    //                                 ->where('role_id', $roleId)
+                    //                                 ->first();
+
+                    // $purchaseRequestApproval->approve_user_id   = $user->id;
+                    // $purchaseRequestApproval->approved_at       = Carbon::now();
+
+                    // $purchaseRequestApproval->save();
+
+                    // notif
+                    (new ServiceNotification([$purchaseRequest->user]))->action(
+                        'PR Approved',
+                        'purchase-request-detail',
+                        [ 'id' => $purchaseRequest->id ],
+                        $purchaseRequest->code . ' approved by ' . $user->name
+                    );
+
+                    // send ke office supervisor selanjutnya atau send ke procurement officer
+
+                } else {
+
+                    $statusTitle = 'reject office approval';
+
+                    PurchaseRequestApproval::where('purchase_request_id', $purchaseRequest->id)
+                                                    ->update([
+                                                        'approved_at'           => null,
+                                                        'approve_user_id'       => null,
+                                                    ]);
+
+                    // notif
+                    (new ServiceNotification([$purchaseRequest->user]))->action(
+                        'PR Rejected',
+                        'purchase-request-detail',
+                        [ 'id' => $purchaseRequest->id ],
+                        $purchaseRequest->code . ' rejected by' . $user->name
+                    );
+
+                }
+
+                $purchaseRequestStatus = PurchaseRequestStatus::where('title', $statusTitle)->first();
+
+                $purchaseRequest->purchase_request_status_id    = $purchaseRequestStatus->id;
+                $purchaseRequest->code_rfq                      = PurchaseRequest::generateRFQNumber();
 
                 $purchaseRequest->save();
 

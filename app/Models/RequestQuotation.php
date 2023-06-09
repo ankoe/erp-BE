@@ -2,56 +2,33 @@
 
 namespace App\Models;
 
-use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PurchaseRequestItem extends Model
+class RequestQuotation extends Model
 {
-    use Filterable, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
-        'purchase_request_id',
-        'material_id',
-        'price',
-        'description',
-        'quantity',
-        'total',
+        'company_id',
+        'purchase_request_item_id',
         'vendor_id',
-        'branch_id',
-        'expected_at',
-        'file',
-        'is_approve',
-        'remarks'
+        'vendor_price',
+        'vendor_stock',
+        'is_selected'
+    ];
+
+    protected $casts = [
+        'is_selected' => 'boolean',
     ];
 
     /***********************************************
      *  1. Relation
     ***********************************************/
 
-    public function purchaseRequest()
-    {
-        return $this->belongsTo(PurchaseRequest::class);
-    }
-
-    public function branch()
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
-    public function material()
-    {
-        return $this->belongsTo(Material::class);
-    }
-
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
-    }
-
-    public function requestQuotation()
-    {
-        return $this->hasMany(RequestQuotation::class);
     }
 
     /***********************************************

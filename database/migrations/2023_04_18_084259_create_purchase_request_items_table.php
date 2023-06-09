@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('expected_at');
             $table->string('file', 100);
             $table->boolean('is_approve')->nullable();
+            $table->string('remarks', 200)->nullable();
             $table->timestamps();
         });
     }

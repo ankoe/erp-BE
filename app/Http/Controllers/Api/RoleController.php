@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PermissionType;
 use App\Enums\RoleGroup;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\RoleFilter;

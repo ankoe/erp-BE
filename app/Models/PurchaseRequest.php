@@ -14,6 +14,7 @@ class PurchaseRequest extends Model
         'company_id',
         'user_id',
         'code',
+        'code_rfq',
         'purchase_request_status_id',
     ];
 
@@ -34,6 +35,16 @@ class PurchaseRequest extends Model
     public function purchaseRequestStatus()
     {
         return $this->belongsTo(PurchaseRequestStatus::class);
+    }
+
+    public function purchaseRequestApproval()
+    {
+        return $this->hasMany(PurchaseRequestApproval::class);
+    }
+
+    public function purchaseRequestApprovalHistory()
+    {
+        return $this->hasMany(PurchaseRequestApprovalHistory::class);
     }
 
     public function purchaseRequestItem()
@@ -63,7 +74,7 @@ class PurchaseRequest extends Model
      *  4. Function
     ***********************************************/
 
-    public static function generateDocumentNumber()
+    public static function generatePRNumber()
     {
         $company_id = auth()->user()->company->id;
         $month = date('m');
@@ -78,7 +89,28 @@ class PurchaseRequest extends Model
         $documentNumber = $count ? ($count + 1) : 1;
 
         // Format nomor dokumen dengan menambahkan bulan dan tahun
-        $documentNumber = 'PR' . $year . '-' . $month . '-' . str_pad($documentNumber, 4, '0', STR_PAD_LEFT);
+        $documentNumber = 'PR-' . substr($year, 2) . $month . '-' . str_pad($documentNumber, 4, '0', STR_PAD_LEFT);
+
+        return $documentNumber;
+    }
+
+    public static function generateRFQNumber()
+    {
+        $company_id = auth()->user()->company->id;
+        $month = date('m');
+        $year = date('Y');
+
+        $count = self::where('company_id', $company_id)
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->whereNotNull('code_rfq')
+            ->count();
+
+        // Mendapatkan nomor urut dokumen
+        $documentNumber = $count ? ($count + 1) : 1;
+
+        // Format nomor dokumen dengan menambahkan bulan dan tahun
+        $documentNumber = 'RFQ-' . substr($year, 2) . $month . '-' . str_pad($documentNumber, 4, '0', STR_PAD_LEFT);
 
         return $documentNumber;
     }

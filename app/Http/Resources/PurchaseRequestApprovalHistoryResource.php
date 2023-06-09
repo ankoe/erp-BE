@@ -2,12 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\RoleResource;
-use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PurchaseRequestApprovalResource extends JsonResource
+class PurchaseRequestApprovalHistoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,10 +17,11 @@ class PurchaseRequestApprovalResource extends JsonResource
         return [
             "id"                    => $this->id,
             "purchase_request_id"   => $this->purchase_request_id,
-            "order"                 => $this->order,
             "role"                  => new RoleResource($this->role),
-            "approve_user"          => $this->approve_user_id ? new UserResource($this->user) : null,
+            "user"                  => new UserResource($this->user),
             "approved_at"           => $this->approved_at,
+            "approve_status"        => $this->approve_status,
+            "remarks"               => $this->remarks,
             "created_at"            => $this->created_at,
             "updated_at"            => $this->updated_at
         ];

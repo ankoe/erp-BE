@@ -8,7 +8,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RequestForQuotationResource extends JsonResource
+class RequestQuotationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,11 +19,12 @@ class RequestForQuotationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'code' => $this->code_rfq,
-            'user' => new UserResource($this->user),
-            'status' => new PurchaseRequestStatusResource($this->PurchaseRequestStatus),
-            'total' => $this->purchaseRequestItemApprove()->sum('total'),
-            'items' => PurchaseRequestItemResource::collection($this->purchaseRequestItemApprove),
+            'company_id' => $this->company_id,
+            'purchase_request_item_id' => $this->purchase_request_item_id,
+            'vendor' => new VendorResource($this->vendor),
+            'vendor_price' => $this->vendor_price,
+            'vendor_stock' => $this->vendor_stock,
+            'is_selected' => $this->is_selected,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

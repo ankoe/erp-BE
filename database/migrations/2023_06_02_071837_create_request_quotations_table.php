@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_requests', function (Blueprint $table) {
+        Schema::create('request_quotations', function (Blueprint $table) {
             $table->id();
             $table->integer('company_id');
-            $table->integer('user_id');
-            $table->string('code', 15);
-            $table->string('code', 20);
-            $table->integer('purchase_request_status_id');
+            $table->integer('purchase_request_item_id');
+            $table->integer('vendor_id');
+            $table->integer('vendor_price')->nullable();
+            $table->integer('vendor_stock')->nullable();
+            $table->boolean('is_selected')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_requests');
+        Schema::dropIfExists('request_quotations');
     }
 };

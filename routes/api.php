@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PurchaseRequestController;
 use App\Http\Controllers\Api\PurchaseRequestItemController;
+use App\Http\Controllers\Api\PurchaseRequestStatusController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VendorController;
@@ -151,6 +152,13 @@ use Illuminate\Support\Facades\Route;
         Route::delete('{id}', 'destroy');
     });
 
+    Route::prefix('purchase-request-status')
+    ->controller(PurchaseRequestStatusController::class)
+    ->middleware('auth:api')
+    ->group(function () {
+        Route::get('all', 'all');
+    });
+
     Route::prefix('role')
     ->controller(RoleController::class)
     ->middleware('auth:api')
@@ -228,6 +236,10 @@ use Illuminate\Support\Facades\Route;
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('{id}', 'show');
+            Route::post('{id}/propose-vendor', 'proposeVendor');
+            Route::post('{id}/propose-approval', 'proposeApproval');
+            Route::get('{id}/set-approve', 'setApprove');
+            Route::get('{id}/set-reject', 'setReject');
         });
 
         Route::prefix('purchase-order')

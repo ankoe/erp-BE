@@ -29,7 +29,7 @@ class PurchaseOrderController extends Controller
         $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
                                 ->where('company_id', $user->company->id)
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->whereNot('title', 'draft');
+                                    $query->where('title', 'po released');
                                 })
                                 ->paginate($request->input('per_page', 10));
 
@@ -47,10 +47,10 @@ class PurchaseOrderController extends Controller
 
         // Perlu diseragamkan return responsenya
         $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->whereNot('title', 'draft');
-                                })
                                 ->where('company_id', $user->company->id)
+                                ->whereHas('purchaseRequestStatus', function($query) {
+                                    $query->where('title', 'po released');
+                                })
                                 ->get();
 
         return PurchaseRequestResource::collection($purchaseRequests);

@@ -83,7 +83,7 @@ class PurchaseRequestController extends Controller
         $purchaseRequest = PurchaseRequest::create([
             'company_id'                    => $user->company->id,
             'user_id'                       => $user->id,
-            'code'                          => PurchaseRequest::generateDocumentNumber(),
+            'code'                          => PurchaseRequest::generatePRNumber(),
             'purchase_request_status_id'    => $purchaseRequestStatus->id,
         ]);
 
@@ -143,18 +143,26 @@ class PurchaseRequestController extends Controller
 
                 $bulkPurchaseRequestApproval = array();
 
-                foreach ($configApprovals as $configApproval) {
+                $purchaseRequestApproval = PurchaseRequestApproval::where('purchase_request_id', $purchaseRequest->id)
+                                                            ->first();
 
-                    if ($configApproval->order == 1) $firstRoleId = $configApproval->role_id;
+                if (!$purchaseRequestApproval) {
 
-                    array_push($bulkPurchaseRequestApproval, [
-                        'purchase_request_id'   => $purchaseRequest->id,
-                        'order'                 => $configApproval->order,
-                        'role_id'               => $configApproval->role_id
-                    ]);
+                    foreach ($configApprovals as $configApproval) {
+
+                        if ($configApproval->order == 1) $firstRoleId = $configApproval->role_id;
+
+                        array_push($bulkPurchaseRequestApproval, [
+                            'purchase_request_id'   => $purchaseRequest->id,
+                            'order'                 => $configApproval->order,
+                            'role_id'               => $configApproval->role_id
+                        ]);
+                    }
+
+                    PurchaseRequestApproval::insert($bulkPurchaseRequestApproval);
+                } else {
+                    $firstRoleId = $purchaseRequestApproval->id;
                 }
-
-                PurchaseRequestApproval::insert($bulkPurchaseRequestApproval);
 
                 // send Notification
                 $users = User::where('company_id', $user->company->id)

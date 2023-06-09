@@ -8,6 +8,7 @@ use App\Http\Resources\PurchaseRequestItemResource;
 use App\Http\Validations\PurchaseRequestItemValidation;
 use App\Models\PurchaseRequestItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PurchaseRequestItemController extends Controller
@@ -113,15 +114,20 @@ class PurchaseRequestItemController extends Controller
 
         if ($purchaseRequestItem)
         {
-            $purchaseRequestItem->material_id     = $request->material_id;
-            $purchaseRequestItem->price     = $request->price;
-            $purchaseRequestItem->description     = $request->description;
-            $purchaseRequestItem->quantity     = $request->quantity;
-            $purchaseRequestItem->total     = $request->total;
+            if ( $request->hasFile('file') )
+            {
+                if( !is_null($purchaseRequestItem->file) ) Storage::delete($purchaseRequestItem->file);
+                $purchaseRequestItem->file = $request->file('file')->store('public/pr_item');
+            }
+
+            $purchaseRequestItem->material_id   = $request->material_id;
+            $purchaseRequestItem->price         = $request->price;
+            $purchaseRequestItem->description   = $request->description;
+            $purchaseRequestItem->quantity      = $request->quantity;
+            $purchaseRequestItem->total         = $request->price * $request->quantity;
             $purchaseRequestItem->vendor_id     = $request->vendor_id;
             $purchaseRequestItem->branch_id     = $request->branch_id;
-            $purchaseRequestItem->expected_at     = $request->expected_at;
-            $purchaseRequestItem->file     = $request->file;
+            $purchaseRequestItem->expected_at   = $request->expected_at;
 
             $purchaseRequestItem->save();
 

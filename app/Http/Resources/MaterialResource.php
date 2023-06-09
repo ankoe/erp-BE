@@ -17,7 +17,7 @@ class MaterialResource extends JsonResource
     {
         return [
             'id'                => $this->id,
-            'material_category' => $this->material_category_id ? new MaterialCategoryResource($this->MaterialCategory) : null,
+            'material_category' => $this->material_category_id ? new MaterialCategoryResource($this->materialCategory) : null,
             'name'              => $this->name,
             'number'            => $this->number,
             'description'       => $this->description,

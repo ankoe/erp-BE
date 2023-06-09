@@ -17,10 +17,10 @@ class PurchaseRequestFilter extends Filter
     //     return $this->builder->where('borrower', 'ilike', '%' . $borrower . '%');
     // }
 
-    // public function nominal($nominal): Builder
-    // {
-    //     return $this->builder->where('nominal', $nominal);
-    // }
+    public function purchase_request_status_id($purchaseRequestStatusId): Builder
+    {
+        return $this->builder->where('purchase_request_status_id', $purchaseRequestStatusId);
+    }
 
     // public function rest($rest): Builder
     // {

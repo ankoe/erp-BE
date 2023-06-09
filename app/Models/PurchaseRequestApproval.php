@@ -22,6 +22,16 @@ class PurchaseRequestApproval extends Model
      *  1. Relation
     ***********************************************/
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'approve_user_id');
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     /***********************************************
      *  2. Getter & Setter
     ***********************************************/

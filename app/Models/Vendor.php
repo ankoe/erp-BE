@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Vendor extends Model
 {
     use Filterable, HasFactory;
 
     protected $fillable = [
-        'company_id', 'name', 'material_category_id', 'email'
+        'company_id', 'name', 'material_category_id', 'email', 'slug'
     ];
 
     /***********************************************
@@ -39,4 +40,18 @@ class Vendor extends Model
     /***********************************************
      *  4. Function
     ***********************************************/
+
+    public function generateUniqueSlug()
+    {
+        $slug = Str::random(10); // Generate a random 8-character slug
+
+        // Check if the slug already exists for the current model instance
+        while (static::where('slug', $slug)->where('id', '!=', $this->id)->exists()) {
+            $slug = Str::random(8); // Generate a new slug
+        }
+
+        $this->slug = $slug; // Assign the unique slug to the model instance
+
+        return $slug;
+    }
 }

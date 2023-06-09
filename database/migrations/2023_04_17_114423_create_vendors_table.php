@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name', 50);
             $table->integer('material_category_id');
             $table->string('email', 50);
+            $table->string('slug', 150)->nullable()->unique();
             $table->timestamps();
         });
     }
