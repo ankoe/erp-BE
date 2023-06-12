@@ -17,7 +17,8 @@ use App\Http\Controllers\Api\Office\PurchaseRequestController as OfficePurchaseR
 use App\Http\Controllers\Api\Procurement\PurchaseRequestController as ProcurementPurchaseRequestController;
 use App\Http\Controllers\Api\Procurement\RequestForQuotationController as ProcurementRequestForQuotationController;
 use App\Http\Controllers\Api\Procurement\PurchaseOrderController as ProcurementPurchaseOrderController;
-use App\Http\Controllers\Api\Supplier\OfferController as SupplierOfferController;
+use App\Http\Controllers\Api\Supplier\RequestForQuotationController as SupplierRequestForQuotationController;
+use App\Http\Controllers\Api\Supplier\PurchaseOrderController as SupplierPurchaseOrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -256,11 +257,19 @@ use Illuminate\Support\Facades\Route;
 
 
     Route::prefix('supplier')
-    ->middleware('auth:api')
     ->group(function () {
 
-        Route::prefix('offer')
-        ->controller(SupplierOfferController::class)
+        Route::prefix('request-for-quotation')
+        ->controller(SupplierRequestForQuotationController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('{id}', 'show');
+        });
+
+        Route::prefix('purchase-order')
+        ->controller(SupplierPurchaseOrderController::class)
         ->group(function () {
             Route::get('all', 'all');
             Route::get('/', 'index');
