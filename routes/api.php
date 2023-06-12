@@ -256,7 +256,7 @@ use Illuminate\Support\Facades\Route;
     });
 
 
-    Route::prefix('supplier')
+    Route::prefix('supplier/{slug}')
     ->group(function () {
 
         Route::prefix('request-for-quotation')

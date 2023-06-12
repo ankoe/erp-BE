@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Supplier;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\PurchaseRequestFilter;
+use App\Http\Resources\PurchaseRequestItemResource;
 use App\Http\Resources\RequestForQuotationResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Mail\Approval\VendorRFQAccessMail;
@@ -24,21 +25,21 @@ use Illuminate\Support\Facades\Validator;
 
 class RequestForQuotationController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $slug)
     {
         $validated = Validator::make($request->all(), PurchaseRequestValidation::index());
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
-        $user = auth()->user();
-
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequests = PurchaseRequest::whereHas(
+                                'purchaseRequestItem.requestQuotation.vendor',
+                                function ($query) use ($slug) {
+                                    $query->where('slug', $slug);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->where('title', 'waiting rfq response')
                                     ->orWhere('title', 'waiting rfq approval')
                                     ->orWhere('title', 'waiting po confirmation');
-
                                 })
                                 ->paginate($request->input('per_page', 10));
 
@@ -46,17 +47,18 @@ class RequestForQuotationController extends Controller
     }
 
 
-    public function all(Request $request)
+    public function all(Request $request, $slug)
     {
         $validated = Validator::make($request->all(), PurchaseRequestValidation::all());
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
-        $user = auth()->user();
-
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequests = PurchaseRequest::whereHas(
+                                'purchaseRequestItem.requestQuotation.vendor',
+                                function ($query) use ($slug) {
+                                    $query->where('slug', $slug);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->where('title', 'waiting rfq response')
                                     ->orWhere('title', 'waiting rfq approval')
@@ -68,7 +70,7 @@ class RequestForQuotationController extends Controller
     }
 
 
-    public function show(Request $request, $id)
+    public function show(Request $request, $slug, $id)
     {
 
         $request['id'] = $id;
@@ -77,220 +79,19 @@ class RequestForQuotationController extends Controller
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
 
-        $user = auth()->user();
+        $purchaseRequestItems = PurchaseRequestItem::where('purchase_request_id', $id)
+                                    ->whereHas(
+                                    'requestQuotation.vendor',
+                                    function ($query) use ($slug) {
+                                        $query->where('slug', $slug);
+                                    })
+                                    ->get();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
+        if ($purchaseRequestItems)
         {
-            return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'Get detail');
+            return PurchaseRequestItemResource::collection($purchaseRequestItems);
         }
 
         return $this->responseError([], 'Not found');
-    }
-
-
-    public function proposeVendor(Request $request, $id)
-    {
-        // $request['id'] = $id;
-
-        // // $validated = Validator::make($request->all(), PurchaseRequestValidation::approval());
-
-        // // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
-        {
-            DB::beginTransaction();
-
-            try {
-                $vendors = [];
-                $bulkRequestQuotation = [];
-                foreach ($request->items as $item) {
-                    foreach ($item['vendors'] as $vendor) {
-                        array_push($bulkRequestQuotation, [
-                            'company_id' => $user->company->id,
-                            'purchase_request_item_id' => $item['id'],
-                            'vendor_id' => $vendor,
-                            'created_at' => Carbon::now(),
-                        ]);
-
-                        array_push($vendors, $vendor);
-                    }
-
-                    PurchaseRequestItem::where('id', $item['id'])->update([ 'incoterms' => $item['incoterms'] ]);
-                }
-
-                RequestQuotation::insert($bulkRequestQuotation);
-
-                $vendors = Vendor::where('company_id', $user->company->id)->whereIn('id', array_unique($vendors))->get();
-
-                // kirim email
-                foreach ($vendors as $vendor) {
-                    Mail::to($vendor->email)->send(new VendorRFQAccessMail($vendor));
-                }
-
-                // ganti status
-
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq approval')->first();
-
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
-
-                $purchaseRequest->save();
-
-                DB::commit();
-
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
-
-            } catch(\Throwable $e) {
-
-                DB::rollback();
-
-                return $this->responseError([], $e->getMessage());
-            }
-        }
-
-        return $this->responseError([], 'Not found');
-    }
-
-
-    public function proposeApproval(Request $request, $id)
-    {
-        // $request['id'] = $id;
-
-        // // $validated = Validator::make($request->all(), PurchaseRequestValidation::approval());
-
-        // // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
-        {
-            DB::beginTransaction();
-
-            try {
-                $bulkPurchaseRequestItemId = [];
-                $bulkRequestQuotationId = [];
-                foreach ($request->items as $item) {
-                    array_push($bulkPurchaseRequestItemId, $item['id']);
-                    array_push($bulkRequestQuotationId, $item['selected_id']);
-                }
-
-                RequestQuotation::whereIn('purchase_request_item_id', $bulkPurchaseRequestItemId)->update(['is_selected' => false]);
-                RequestQuotation::whereIn('id', $bulkRequestQuotationId)->update(['is_selected' => true]);
-
-                // ganti status
-
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting po confirmation')->first();
-
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
-
-                $purchaseRequest->save();
-
-                DB::commit();
-
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'rfq send to approval role');
-
-            } catch(\Throwable $e) {
-
-                DB::rollback();
-
-                return $this->responseError([], $e->getMessage());
-            }
-        }
-
-        return $this->responseError([], 'Not found');
-        // saat klik link di email si vendor akan menampilkan per rfq lalu menampilkan detail dia
-    }
-
-
-    public function setApprove(Request $request, $id)
-    {
-        // $request['id'] = $id;
-
-        // // $validated = Validator::make($request->all(), PurchaseRequestValidation::approval());
-
-        // // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
-        {
-            DB::beginTransaction();
-
-            try {
-
-                // ganti status
-
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'po released')->first();
-
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
-
-                $purchaseRequest->save();
-
-                DB::commit();
-
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
-
-            } catch(\Throwable $e) {
-
-                DB::rollback();
-
-                return $this->responseError([], $e->getMessage());
-            }
-        }
-
-        return $this->responseError([], 'Not found');
-        // saat klik link di email si vendor akan menampilkan per rfq lalu menampilkan detail dia
-    }
-
-
-    public function setReject(Request $request, $id)
-    {
-        // $request['id'] = $id;
-
-        // // $validated = Validator::make($request->all(), PurchaseRequestValidation::approval());
-
-        // // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
-        {
-            DB::beginTransaction();
-
-            try {
-
-                // ganti status
-
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq approval')->first();
-
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
-
-                $purchaseRequest->save();
-
-                DB::commit();
-
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
-
-            } catch(\Throwable $e) {
-
-                DB::rollback();
-
-                return $this->responseError([], $e->getMessage());
-            }
-        }
-
-        return $this->responseError([], 'Not found');
-        // saat klik link di email si vendor akan menampilkan per rfq lalu menampilkan detail dia
     }
 }

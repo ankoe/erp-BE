@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Supplier;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\PurchaseRequestFilter;
+use App\Http\Resources\PurchaseRequestItemResource;
 use App\Http\Resources\PurchaseRequestResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Models\ConfigApproval;
@@ -21,16 +22,17 @@ use Illuminate\Support\Facades\Validator;
 
 class PurchaseOrderController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $slug)
     {
         $validated = Validator::make($request->all(), PurchaseRequestValidation::index());
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
-        $user = auth()->user();
-
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequests = PurchaseRequest::whereHas(
+                                'purchaseRequestItem.requestQuotation.vendor',
+                                function ($query) use ($slug) {
+                                    $query->where('slug', $slug);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->where('title', 'po released');
                                 })
@@ -40,17 +42,18 @@ class PurchaseOrderController extends Controller
     }
 
 
-    public function all(Request $request)
+    public function all(Request $request, $slug)
     {
         $validated = Validator::make($request->all(), PurchaseRequestValidation::all());
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
-        $user = auth()->user();
-
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequests = PurchaseRequest::whereHas(
+                                'purchaseRequestItem.requestQuotation.vendor',
+                                function ($query) use ($slug) {
+                                    $query->where('slug', $slug);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->where('title', 'po released');
                                 })
@@ -60,7 +63,7 @@ class PurchaseOrderController extends Controller
     }
 
 
-    public function show(Request $request, $id)
+    public function show(Request $request, $slug, $id)
     {
 
         $request['id'] = $id;
@@ -69,44 +72,17 @@ class PurchaseOrderController extends Controller
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
 
-        $user = auth()->user();
+        $purchaseRequestItems = PurchaseRequestItem::where('purchase_request_id', $id)
+                                    ->whereHas(
+                                    'requestQuotation.vendor',
+                                    function ($query) use ($slug) {
+                                        $query->where('slug', $slug);
+                                    })
+                                    ->get();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
-
-        if ($purchaseRequest)
+        if ($purchaseRequestItems)
         {
-            return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Get detail');
-        }
-
-        return $this->responseError([], 'Not found');
-    }
-
-
-    public function printPODocument(Request $request, $id, $vendorId)
-    {
-        // $request['id'] = $id;
-
-        // $validated = Validator::make($request->all(), PurchaseRequestValidation::show());
-
-        // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
-
-        $user = auth()->user();
-
-        $vendor = Vendor::where('id', $id)->first();
-
-        $purchaseRequestItems = PurchaseRequestItem::where('purchase_request_id', $id)->where('winning_vendor_id', $vendorId)->get();
-
-
-        if ($purchaseRequestItem)
-        {
-            $pdf = Pdf::loadView('document.purchase_order',
-                [
-                    'company'               => $user->company,
-                    'vendor'                => $vendor,
-                    'purchaseRequestItems'  => $purchaseRequestItems // seharusnya bisa pervendor dikumpulin jadi satu
-                ]);
-
-            return $pdf->stream('invoice.pdf');
+            return PurchaseRequestItemResource::collection($purchaseRequestItems);
         }
 
         return $this->responseError([], 'Not found');
