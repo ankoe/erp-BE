@@ -249,6 +249,7 @@ use Illuminate\Support\Facades\Route;
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('{id}', 'show');
+            Route::get('{id}/generate-po-vendor/{$vendorId}', 'printPODocument');
         });
 
     });
