@@ -9,10 +9,12 @@ use App\Http\Validations\PurchaseRequestValidation;
 use App\Models\ConfigApproval;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestApproval;
+use App\Models\PurchaseRequestApprovalHistory;
 use App\Models\PurchaseRequestItem;
 use App\Models\PurchaseRequestStatus;
 use App\Models\User;
 use App\Services\Notification as ServiceNotification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -165,6 +167,15 @@ class PurchaseRequestController extends Controller
                 $purchaseRequest->code_rfq                      = PurchaseRequest::generateRFQNumber();
 
                 $purchaseRequest->save();
+
+                PurchaseRequestApprovalHistory::create([
+                    'purchase_request_id'   => $purchaseRequest->id,
+                    'role_id'               => $user->roles->pluck("id")->first(),
+                    'user_id'               => $user->id,
+                    'approved_at'           => Carbon::now(),
+                    'approve_status'        => $allApprove ? 'approve' : 'reject',
+                    'remarks'               => null,
+                ]);
 
                 DB::commit();
 

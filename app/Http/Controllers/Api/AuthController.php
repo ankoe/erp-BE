@@ -190,6 +190,7 @@ class AuthController extends Controller
                                                 [
                                                     PermissionType::ProcurementPurchaseOrder,
                                                     PermissionType::ProcurementRFQ,
+                                                    PermissionType::ProcurementRFQApproval,
                                                     PermissionType::ProcurementPO,
                                                     PermissionType::ProcurementMessage,
                                                 ])->get();

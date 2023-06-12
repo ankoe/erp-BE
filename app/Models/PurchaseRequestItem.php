@@ -22,7 +22,12 @@ class PurchaseRequestItem extends Model
         'expected_at',
         'file',
         'is_approve',
-        'remarks'
+        'remarks',
+        'incoterms',
+        'winning_vendor_id',
+        'winning_vendor_price',
+        'winning_vendor_stock',
+        'winning_vendor_incoterms',
     ];
 
     /***********************************************
@@ -47,6 +52,11 @@ class PurchaseRequestItem extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function winningVendor()
+    {
+        return $this->belongsTo(Vendor::class, 'winning_vendor_id');
     }
 
     public function requestQuotation()

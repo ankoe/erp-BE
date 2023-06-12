@@ -25,6 +25,11 @@ return new class extends Migration
             $table->string('file', 100);
             $table->boolean('is_approve')->nullable();
             $table->string('remarks', 200)->nullable();
+            $table->string('incoterms', 100)->nullable();
+            $table->integer('winning_vendor_id')->nullable();
+            $table->integer('winning_vendor_price')->nullable();
+            $table->integer('winning_vendor_stock')->nullable();
+            $table->string('winning_vendor_incoterms', 100)->nullable();
             $table->timestamps();
         });
     }

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('vendor_id');
             $table->integer('vendor_price')->nullable();
             $table->integer('vendor_stock')->nullable();
+            $table->string('vendor_incoterms', 100)->nullable();
+            $table->boolean('vendor_is_agree')->nullable();
             $table->boolean('is_selected')->nullable();
             $table->timestamps();
         });

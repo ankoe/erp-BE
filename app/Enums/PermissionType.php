@@ -23,6 +23,7 @@ final class PermissionType extends Enum
     // ---------------------------------------
     const ProcurementPurchaseOrder  = 'procurement purchase request';
     const ProcurementRFQ            = 'procurement rfq';
+    const ProcurementRFQApproval    = 'procurement rfq approval';
     const ProcurementPO             = 'procurement po';
     const ProcurementMessage        = 'procurement message';
 

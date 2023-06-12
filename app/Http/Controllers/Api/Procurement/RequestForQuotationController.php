@@ -10,6 +10,7 @@ use App\Mail\Approval\VendorRFQAccessMail;
 use App\Models\ConfigApproval;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestApproval;
+use App\Models\PurchaseRequestItem;
 use App\Models\PurchaseRequestStatus;
 use App\Models\RequestQuotation;
 use App\Models\User;
@@ -119,6 +120,8 @@ class RequestForQuotationController extends Controller
 
                         array_push($vendors, $vendor);
                     }
+
+                    PurchaseRequestItem::where('id', $item['id'])->update([ 'incoterms' => $item['incoterms'] ]);
                 }
 
                 RequestQuotation::insert($bulkRequestQuotation);
@@ -175,7 +178,7 @@ class RequestForQuotationController extends Controller
                 $bulkRequestQuotationId = [];
                 foreach ($request->items as $item) {
                     array_push($bulkPurchaseRequestItemId, $item['id']);
-                    array_push($bulkRequestQuotationId, $item['id']);
+                    array_push($bulkRequestQuotationId, $item['selected_id']);
                 }
 
                 RequestQuotation::whereIn('purchase_request_item_id', $bulkPurchaseRequestItemId)->update(['is_selected' => false]);
@@ -191,7 +194,7 @@ class RequestForQuotationController extends Controller
 
                 DB::commit();
 
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
+                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'rfq send to approval role');
 
             } catch(\Throwable $e) {
 
@@ -269,7 +272,7 @@ class RequestForQuotationController extends Controller
 
                 // ganti status
 
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'po released')->first();
+                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq approval')->first();
 
                 $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
 

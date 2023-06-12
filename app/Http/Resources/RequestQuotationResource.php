@@ -18,15 +18,16 @@ class RequestQuotationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'company_id' => $this->company_id,
-            'purchase_request_item_id' => $this->purchase_request_item_id,
-            'vendor' => new VendorResource($this->vendor),
-            'vendor_price' => $this->vendor_price,
-            'vendor_stock' => $this->vendor_stock,
-            'is_selected' => $this->is_selected,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'id'                        => $this->id,
+            'company_id'                => $this->company_id,
+            'purchase_request_item_id'  => $this->purchase_request_item_id,
+            'vendor'                    => new VendorResource($this->vendor),
+            'vendor_price'              => $this->vendor_price,
+            'vendor_stock'              => $this->vendor_stock,
+            'vendor_incoterms'          => $this->incoterms,
+            'is_selected'               => $this->is_selected,
+            'created_at'                => $this->created_at,
+            'updated_at'                => $this->updated_at,
         ];
     }
 }

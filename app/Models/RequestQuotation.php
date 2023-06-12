@@ -15,6 +15,8 @@ class RequestQuotation extends Model
         'vendor_id',
         'vendor_price',
         'vendor_stock',
+        'vendor_incoterms',
+        'vendor_is_agree',
         'is_selected'
     ];
 

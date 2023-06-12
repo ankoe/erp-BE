@@ -14,6 +14,4 @@ opsi (tambah sendiri)
 
 - validasi role jika nama sama belum ke catch
 - tanda waktu diatas supervisor statis dari waktu user submit
-- jika propose supervisor reject kembali memilih vendor
-- saat usulan vendor disamping terdapat pemilihan kolom incoterm
-- di po detail isinya incoterm tujuan, vendor, harga yg vendor sudah setujui
+- jika procurement supervisor reject kembali memilih vendor

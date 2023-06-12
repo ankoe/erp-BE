@@ -16,6 +16,7 @@ class PurchaseRequest extends Model
         'code',
         'code_rfq',
         'purchase_request_status_id',
+        'incoterms'
     ];
 
     /***********************************************
