@@ -20,6 +20,7 @@ class VendorResource extends JsonResource
             'material_category' => $this->material_category_id ? new MaterialCategoryResource($this->MaterialCategory) : null,
             'name'              => $this->name,
             'email'             => $this->email,
+            'slug'              => $this->slug,
             'created_at'        => $this->created_at,
         ];
     }

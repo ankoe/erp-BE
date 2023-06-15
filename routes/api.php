@@ -266,6 +266,7 @@ use Illuminate\Support\Facades\Route;
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('{id}', 'show');
+            Route::post('{id}/send-offer', 'sendOffer');
         });
 
         Route::prefix('purchase-order')
@@ -275,6 +276,8 @@ use Illuminate\Support\Facades\Route;
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('{id}', 'show');
+            Route::post('{id}/set-approve', 'setApprove');
+            Route::post('{id}/set-reject', 'setReject');
         });
 
     });

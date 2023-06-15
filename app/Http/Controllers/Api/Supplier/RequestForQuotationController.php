@@ -94,4 +94,26 @@ class RequestForQuotationController extends Controller
 
         return $this->responseError([], 'Not found');
     }
+
+
+    public function sendOffer(Request $request, $slug, $id)
+    {
+
+        $request['id'] = $id;
+
+        // $validated = Validator::make($request->all(), PurchaseRequestValidation::show());
+
+        // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
+
+        foreach ($request->items as $item) {
+            RequestQuotation::where('id', $item['id'])
+                ->update([
+                    'vendor_price' => $item['vendor_price'],
+                    'vendor_stock' => $item['vendor_stock'],
+                    'vendor_incoterms' => $item['vendor_incoterms'],
+                ]);
+        }
+
+        return $this->responseSuccess([], 'offer success');
+    }
 }

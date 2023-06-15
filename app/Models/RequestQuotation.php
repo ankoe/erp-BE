@@ -22,6 +22,7 @@ class RequestQuotation extends Model
 
     protected $casts = [
         'is_selected' => 'boolean',
+        'vendor_is_agree' => 'boolean',
     ];
 
     /***********************************************
