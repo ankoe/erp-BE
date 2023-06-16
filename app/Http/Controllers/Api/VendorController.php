@@ -77,7 +77,7 @@ class VendorController extends Controller
             'name'                  => $request->name,
             'material_category_id'  => $request->material_category_id,
             'email'                 => $request->email,
-            'slug'                  => Vendor::generateUniqueSlug(),
+            'slug'                  => (new Vendor())->generateUniqueSlug(),
         ]);
 
         return $this->responseSuccess($vendor, 'Add new vendor');
