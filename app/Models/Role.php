@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Models\Role as Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Role extends Model
 {
-    use Filterable, HasFactory;
+    use Filterable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'company_id',

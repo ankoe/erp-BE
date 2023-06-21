@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MaterialCategory extends Model
 {
-    use Filterable, HasFactory;
+    use Filterable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'company_id', 'name',

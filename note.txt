@@ -15,3 +15,16 @@ opsi (tambah sendiri)
 - validasi role jika nama sama belum ke catch
 - tanda waktu diatas supervisor statis dari waktu user submit
 - jika procurement supervisor reject kembali memilih vendor
+----------------------------------------
+user -> disable
+     -> delete (pakai soft delete, sudah implementasi)
+
+vendor -> delete (pakai soft delete, sudah implementasi)
+role -> delete (pakai soft delete, sudah implementasi)
+branch -> delete (pakai soft delete, sudah implementasi)
+material -> delete (pakai soft delete, sudah implementasi)
+material category -> delete (pakai soft delete, sudah implementasi)
+
+
+purchase request -> delete (hard delete, sudah implementasi)
+purchase request item -> delete (hard delete, sudah implementasi)
