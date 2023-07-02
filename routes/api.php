@@ -1,8 +1,10 @@
 <?php
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BranchController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ConfigApprovalController;
+use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\MaterialCategoryController;
 use App\Http\Controllers\Api\NotificationController;
@@ -134,11 +136,13 @@ use Illuminate\Support\Facades\Route;
     ->middleware('auth:api')
     ->group(function () {
         Route::get('all', 'all');
+        Route::get('get-pr-code', 'getPRCode');
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::get('{id}', 'show');
         Route::delete('{id}', 'destroy');
         Route::get('{id}/apply', 'apply');
+
     });
 
     Route::prefix('purchase-request-item')
@@ -280,6 +284,29 @@ use Illuminate\Support\Facades\Route;
             Route::post('{id}/set-reject', 'setReject');
         });
 
+    });
+
+
+    // -----------------------------------------------------------
+    //                          CONVERSATION
+    // -----------------------------------------------------------
+
+    Route::prefix('message')
+    ->group(function () {
+        Route::prefix('conversation')
+        ->controller(ConversationController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::post('/', 'store');
+            Route::delete('{id}', 'destroy');
+        });
+
+        Route::prefix('chat')
+        ->controller(ChatController::class)
+        ->group(function () {
+            Route::get('all', 'all');
+            Route::post('/', 'store');
+        });
     });
 
 // });

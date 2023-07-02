@@ -192,4 +192,14 @@ class PurchaseRequestController extends Controller
 
         return $this->responseError([], 'Not found');
     }
+
+
+    public function getPRCode()
+    {
+        $user = auth()->user();
+
+        $generatePRNumber = PurchaseRequest::generatePRNumber();
+
+        return $this->responseSuccess(['code' => $generatePRNumber], 'Purchase Request Generate');
+    }
 }
