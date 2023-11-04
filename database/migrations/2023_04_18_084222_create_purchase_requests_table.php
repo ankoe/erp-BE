@@ -12,13 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchase_requests', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
-            $table->integer('user_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('user_id');
             $table->string('code', 15);
             $table->string('code_rfq', 20)->nullable();
-            $table->integer('purchase_request_status_id');
+            $table->unsignedBigInteger('purchase_request_status_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

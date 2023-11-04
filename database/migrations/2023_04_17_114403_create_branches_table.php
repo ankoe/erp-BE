@@ -12,13 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('branches', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
             $table->string('name', 100);
-            $table->string('address', 100)->nullable();
-            $table->string('email', 50)->nullable();
-            $table->string('mobile', 16)->nullable();
+            $table->string('address', 100);
+            $table->json('email');
+            $table->json('mobile');
+            $table->string('postal_code', 10);
+            $table->string('city', 40);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

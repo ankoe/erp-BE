@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchase_request_approvals', function (Blueprint $table) {
-            $table->id();
-            $table->integer('purchase_request_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('purchase_request_id');
             $table->integer('order');
-            $table->integer('role_id');
-            $table->integer('approve_user_id')->nullable();
+            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('approve_user_id')->nullable();
             $table->datetime('approved_at')->nullable();
             $table->timestamps();
         });

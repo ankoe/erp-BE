@@ -13,7 +13,12 @@ class Vendor extends Model
     use Filterable, HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'company_id', 'name', 'material_category_id', 'email', 'slug'
+        'company_id', 'name', 'email', 'email_cc', 'mobile', 'slug'
+    ];
+
+    protected $casts = [
+        'email_cc' => 'json',
+        'mobile' => 'json',
     ];
 
     /***********************************************
@@ -25,9 +30,9 @@ class Vendor extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function materialCategory()
+    public function materialCategories()
     {
-        return $this->belongsTo(MaterialCategory::class);
+        return $this->belongsToMany(MaterialCategory::class, 'material_category_vendor');
     }
 
     /***********************************************

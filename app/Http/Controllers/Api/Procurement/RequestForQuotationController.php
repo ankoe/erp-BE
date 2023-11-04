@@ -40,6 +40,7 @@ class RequestForQuotationController extends Controller
                                     ->orWhere('title', 'waiting po confirmation');
 
                                 })
+                                ->orderBy('updated_at', 'desc')
                                 ->paginate($request->input('per_page', 10));
 
         return RequestForQuotationResource::collection($purchaseRequests);
@@ -62,6 +63,7 @@ class RequestForQuotationController extends Controller
                                     ->orWhere('title', 'waiting rfq approval')
                                     ->orWhere('title', 'waiting po confirmation');
                                 })
+                                ->orderBy('updated_at', 'desc')
                                 ->get();
 
         return RequestForQuotationResource::collection($purchaseRequests);

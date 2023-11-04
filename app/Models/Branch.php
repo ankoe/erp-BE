@@ -12,7 +12,12 @@ class Branch extends Model
     use Filterable, HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'company_id', 'name', 'address', 'email', 'mobile',
+        'company_id', 'name', 'address', 'email', 'mobile', 'postal_code', 'city'
+    ];
+
+    protected $casts = [
+        'email' => 'json',
+        'mobile' => 'json',
     ];
 
     /***********************************************

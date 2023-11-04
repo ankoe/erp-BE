@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('material_categories', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
             $table->string('name', 100);
+            $table->string('taxonomy', 10);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

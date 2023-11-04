@@ -73,9 +73,10 @@ class MaterialValidation
             'name' => ['required', 'string', 'max:150'],
             'number' => ['required', 'string', 'max:30'],
             'description' => ['required', 'string'],
-            'uom' => ['required', 'string', 'max:20'],
+            'unit_id' => ['required', 'integer', 'exists:App\Models\Unit,id'],
             'price' => ['required', 'integer', 'digits_between:0,99999999'],
-            'stock' => ['required', 'integer', 'digits_between:0,99999999'],
+            'stock' => ['required'],
+            'attachment' => ['required', 'file', 'mimetypes:image/jpeg,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel']
         ];
     }
 
@@ -89,9 +90,10 @@ class MaterialValidation
             'name' => ['required', 'string', 'max:150'],
             'number' => ['required', 'string', 'max:30'],
             'description' => ['required', 'string'],
-            'uom' => ['required', 'string', 'max:20'],
+            'unit_id' => ['required', 'integer', 'exists:App\Models\Unit,id'],
             'price' => ['required', 'integer', 'digits_between:0,99999999'],
-            'stock' => ['required', 'integer', 'digits_between:0,99999999'],
+            'stock' => ['required'],
+            'attachment' => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel']
         ];
     }
 
@@ -99,6 +101,22 @@ class MaterialValidation
      * @return array
      */
     public static function destroy()
+    {
+        return [
+            // 'order_type' => [
+            //     Rule::in(['asc', 'desc'])
+            // ],
+            // 'order_by' => [
+            //     Rule::in([
+            //     ])
+            // ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function generateNumber()
     {
         return [
             // 'order_type' => [

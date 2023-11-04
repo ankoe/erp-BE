@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vendors', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
             $table->string('name', 50);
-            $table->integer('material_category_id');
             $table->string('email', 50);
             $table->string('slug', 150)->nullable()->unique();
+            $table->json('email_cc');
+            $table->json('mobile');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

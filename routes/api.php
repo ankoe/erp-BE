@@ -14,7 +14,10 @@ use App\Http\Controllers\Api\PurchaseRequestItemController;
 use App\Http\Controllers\Api\PurchaseRequestStatusController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UnitController;
 use App\Http\Controllers\Api\VendorController;
+use App\Http\Controllers\Api\MaterialRequestController;
+use App\Http\Controllers\Api\AdminMaterialRequestController;
 use App\Http\Controllers\Api\Office\PurchaseRequestController as OfficePurchaseRequestController;
 use App\Http\Controllers\Api\Procurement\PurchaseRequestController as ProcurementPurchaseRequestController;
 use App\Http\Controllers\Api\Procurement\RequestForQuotationController as ProcurementRequestForQuotationController;
@@ -96,10 +99,33 @@ use Illuminate\Support\Facades\Route;
         Route::delete('{id}', 'destroy');
     });
 
+    Route::prefix('unit')
+    ->controller(UnitController::class)
+    ->middleware('auth:api')
+    ->group(function () {
+        Route::get('all', 'all');
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('{id}', 'show');
+        Route::put('{id}', 'update');
+        Route::delete('{id}', 'destroy');
+    });
+
     Route::prefix('material')
     ->controller(MaterialController::class)
     ->middleware('auth:api')
     ->group(function () {
+
+        Route::prefix('request')
+        ->controller(AdminMaterialRequestController::class)
+        ->group(function () {
+            Route::get('/', 'index');
+            Route::get('{id}', 'show');
+            Route::post('{id}', 'approve');
+            Route::delete('{id}', 'reject');
+        });
+
+        Route::get('generate-number/{categoryId}', 'generateNumber');
         Route::get('all', 'all');
         Route::get('/', 'index');
         Route::post('/', 'store');
@@ -198,6 +224,13 @@ use Illuminate\Support\Facades\Route;
         Route::get('{id}', 'show');
         Route::put('{id}', 'update');
         Route::delete('{id}', 'destroy');
+    });
+
+    Route::prefix('material-request')
+    ->controller(MaterialRequestController::class)
+    ->group(function () {
+        Route::post('/', 'store');
+        Route::get('/', 'index');
     });
 
     // -----------------------------------------------------------

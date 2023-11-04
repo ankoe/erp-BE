@@ -69,9 +69,14 @@ class VendorValidation
     public static function store()
     {
         return [
-            'material_category_id' => ['required', 'integer', 'exists:App\Models\MaterialCategory,id'],
+            'material_categories' => ['required', 'array'],
+            'material_categories.*' => ['required', 'integer', 'distinct', 'exists:App\Models\MaterialCategory,id'],
             'name' => ['required', 'string', 'max:50'],
             'email' => ['required', 'email:rfc,dns', 'max:50'],
+            'email_ccs' => ['required', 'array'],
+            'email_ccs.*' => ['required', 'string', 'max:30', 'distinct'],
+            'mobiles' => ['required', 'array'],
+            'mobiles.*' => ['required', 'string', 'max:15', 'distinct'],
         ];
     }
 
@@ -81,9 +86,14 @@ class VendorValidation
     public static function update()
     {
         return [
-            'material_category_id' => ['required', 'integer', 'exists:App\Models\MaterialCategory,id'],
+            'material_categories' => ['required', 'array'],
+            'material_categories.*' => ['required', 'integer', 'distinct', 'exists:App\Models\MaterialCategory,id'],
             'name' => ['required', 'string', 'max:50'],
             'email' => ['required', 'email:rfc,dns', 'max:50'],
+            'email_ccs' => ['required', 'array'],
+            'email_ccs.*' => ['required', 'string', 'max:30', 'distinct'],
+            'mobiles' => ['required', 'array'],
+            'mobiles.*' => ['required', 'string', 'max:15', 'distinct'],
         ];
     }
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->integer('company_id');
             $table->string('name', 50);
             $table->string('email', 40)->unique();
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->timestamp('confirmed_at')->nullable();
             $table->boolean('is_active');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

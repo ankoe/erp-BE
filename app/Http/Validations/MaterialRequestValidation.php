@@ -4,7 +4,7 @@ namespace App\Http\Validations;
 
 use Illuminate\Validation\Rule;
 
-class MaterialCategoryValidation
+class MaterialRequestValidation
 {
 
 	/**
@@ -69,19 +69,13 @@ class MaterialCategoryValidation
     public static function store()
     {
         return [
-            'name' => ['required', 'string', 'max:100'],
-            'taxonomy' => ['required', 'string', 'max:10'],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public static function update()
-    {
-        return [
-            'name' => ['required', 'string', 'max:100'],
-            'taxonomy' => ['required', 'string', 'max:10'],
+            'material_category_id' => ['nullable', 'integer', 'exists:App\Models\MaterialCategory,id'],
+            'name' => ['required', 'string', 'max:150'],
+            'description' => ['required', 'string'],
+            'unit_id' => ['required', 'integer', 'exists:App\Models\Unit,id'],
+            'price' => ['nullable', 'integer', 'digits_between:0,99999999'],
+            'stock' => ['required'],
+            'attachment' => ['required', 'file', 'mimetypes:image/jpeg,image/png,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel']
         ];
     }
 

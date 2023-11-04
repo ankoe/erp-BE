@@ -5,17 +5,16 @@ namespace App\Models;
 use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Material extends Model
+class MaterialRequest extends Model
 {
-    use Filterable, HasFactory, SoftDeletes;
+    use Filterable, HasFactory;
 
     protected $fillable = [
         'company_id',
+        'user_id',
         'material_category_id',
         'name',
-        'number',
         'description',
         'unit_id',
         'price',
@@ -40,6 +39,11 @@ class Material extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     /***********************************************

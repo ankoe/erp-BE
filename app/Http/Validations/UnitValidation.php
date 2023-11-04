@@ -4,7 +4,7 @@ namespace App\Http\Validations;
 
 use Illuminate\Validation\Rule;
 
-class MaterialCategoryValidation
+class UnitValidation
 {
 
 	/**
@@ -70,7 +70,6 @@ class MaterialCategoryValidation
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'taxonomy' => ['required', 'string', 'max:10'],
         ];
     }
 
@@ -81,7 +80,6 @@ class MaterialCategoryValidation
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'taxonomy' => ['required', 'string', 'max:10'],
         ];
     }
 

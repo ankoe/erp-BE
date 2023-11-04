@@ -12,7 +12,7 @@ class MaterialCategory extends Model
     use Filterable, HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'company_id', 'name',
+        'company_id', 'name', 'taxonomy',
     ];
 
     /***********************************************
@@ -22,6 +22,11 @@ class MaterialCategory extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function vendors(): BelongsToMany
+    {
+        return $this->belongsToMany(Vendor::class, 'material_category_vendor');
     }
 
     /***********************************************

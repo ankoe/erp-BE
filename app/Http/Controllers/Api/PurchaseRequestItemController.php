@@ -79,7 +79,7 @@ class PurchaseRequestItemController extends Controller
 
         $user = auth()->user();
 
-        $file = $request->file('file')->store('public/pr_item');
+        $file = $request->hasFile('file')? $request->file('file')->store('public/pr_item') : null;
 
         $purchaseRequestItem = PurchaseRequestItem::create([
             'purchase_request_id'   => $request->purchase_request_id,

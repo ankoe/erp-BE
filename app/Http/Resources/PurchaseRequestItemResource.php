@@ -30,7 +30,7 @@ class PurchaseRequestItemResource extends JsonResource
             "vendor"                    => new VendorResource($this->vendor),
             "branch"                    => new BranchResource($this->branch),
             "expected_at"               => $this->expected_at,
-            "file"                      => url(Storage::url($this->file)),
+            "file"                      => url(Storage::url($this->file ?? $this->material->attachment)),
             "is_approve"                => $this->is_approve,
             "remarks"                   => $this->remarks,
             "incoterms"                 => $this->incoterms,

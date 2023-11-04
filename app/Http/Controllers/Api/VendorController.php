@@ -75,10 +75,13 @@ class VendorController extends Controller
         $vendor = Vendor::create([
             'company_id'            => $user->company->id,
             'name'                  => $request->name,
-            'material_category_id'  => $request->material_category_id,
             'email'                 => $request->email,
+            'email_cc'              => $request->email_ccs,
+            'mobile'                => $request->mobiles,
             'slug'                  => (new Vendor())->generateUniqueSlug(),
         ]);
+
+        $vendor->materialCategories()->sync($request->material_categories);
 
         return $this->responseSuccess($vendor, 'Add new vendor');
     }
@@ -98,11 +101,14 @@ class VendorController extends Controller
 
         if ($vendor)
         {
-            $vendor->name                   = $request->name;
-            $vendor->material_category_id   = $request->material_category_id;
-            $vendor->email                  = $request->email;
+            $vendor->name           = $request->name;
+            $vendor->email          = $request->email;
+            $vendor->email_cc       = $request->email_ccs;
+            $vendor->mobile         = $request->mobiles;
 
             $vendor->save();
+
+            $vendor->materialCategories()->sync($request->material_categories);
 
             return $this->responseSuccess(new VendorResource($vendor), 'Update vendor');
         }

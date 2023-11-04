@@ -70,9 +70,13 @@ class BranchValidation
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'address' => ['nullable', 'string', 'max:100'],
-            'email' => ['nullable', 'email:rfc,dns'],
-            'mobile' => ['nullable', 'digits_between:11,13'],
+            'address' => ['required', 'string', 'max:100'],
+            'emails' => ['required', 'array'],
+            'emails.*' => ['required', 'email:rfc,dns', 'max:30', 'distinct'],
+            'mobiles' => ['required', 'array'],
+            'mobiles.*' => ['required', 'string', 'max:15', 'distinct'],
+            'postal_code' => ['required', 'string', 'max:10'],
+            'city' => ['required', 'string', 'max:40'],
         ];
     }
 
@@ -83,9 +87,13 @@ class BranchValidation
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'address' => ['nullable', 'string', 'max:100'],
-            'email' => ['nullable', 'email:rfc,dns'],
-            'mobile' => ['nullable', 'digits_between:11,13'],
+            'address' => ['required', 'string', 'max:100'],
+            'emails' => ['required', 'array'],
+            'emails.*' => ['required', 'email:rfc,dns', 'max:30', 'distinct'],
+            'mobiles' => ['required', 'array'],
+            'mobiles.*' => ['required', 'string', 'max:15', 'distinct'],
+            'postal_code' => ['required', 'string', 'max:10'],
+            'city' => ['required', 'string', 'max:40'],
         ];
     }
 

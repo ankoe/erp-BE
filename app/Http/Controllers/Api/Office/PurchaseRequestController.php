@@ -33,6 +33,7 @@ class PurchaseRequestController extends Controller
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->whereNot('title', 'draft');
                                 })
+                                ->orderBy('updated_at', 'desc')
                                 ->paginate($request->input('per_page', 10));
 
         return PurchaseRequestResource::collection($purchaseRequests);
@@ -53,6 +54,7 @@ class PurchaseRequestController extends Controller
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->whereNot('title', 'draft');
                                 })
+                                ->orderBy('updated_at', 'desc')
                                 ->get();
 
         return PurchaseRequestResource::collection($purchaseRequests);

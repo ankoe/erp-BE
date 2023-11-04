@@ -73,8 +73,9 @@ class MaterialCategoryController extends Controller
         $user = auth()->user();
 
         $materialCategory = MaterialCategory::Create([
-            'company_id'         => $user->company->id,
+            'company_id'     => $user->company->id,
             'name'           => $request->name,
+            'taxonomy'       => $request->taxonomy,
         ]);
 
         return $this->responseSuccess($materialCategory, 'Add new material category');
@@ -96,6 +97,7 @@ class MaterialCategoryController extends Controller
         if ($materialCategory)
         {
             $materialCategory->name                 = $request->name;
+            $materialCategory->taxonomy             = $request->taxonomy;
 
             $materialCategory->save();
 

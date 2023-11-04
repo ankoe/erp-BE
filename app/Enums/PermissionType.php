@@ -10,9 +10,13 @@ final class PermissionType extends Enum
     const ConfigApproval    = 'config approval';
     const Material          = 'material';
     const MaterialCategory  = 'material category';
+    const Unit              = 'unit';
     const Role              = 'role';
     const User              = 'user';
     const Vendor            = 'vendor';
+
+    // ---------------------------------------
+    const MaterialRequest  = 'material request';
 
     // ---------------------------------------
     const PurchaseRequest   = 'purchase request';

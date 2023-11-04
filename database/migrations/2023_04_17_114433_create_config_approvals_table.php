@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('config_approvals', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
-            $table->integer('role_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('role_id');
             $table->integer('order');
             $table->timestamps();
         });

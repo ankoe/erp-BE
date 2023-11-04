@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('request_quotations', function (Blueprint $table) {
-            $table->id();
-            $table->integer('company_id');
-            $table->integer('purchase_request_item_id');
-            $table->integer('vendor_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('company_id');
+            $table->unsignedBigInteger('purchase_request_item_id');
+            $table->unsignedBigInteger('vendor_id');
             $table->integer('vendor_price')->nullable();
             $table->integer('vendor_stock')->nullable();
             $table->string('vendor_incoterms', 100)->nullable();

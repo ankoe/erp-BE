@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('conversations', function (Blueprint $table) {
-            $table->id();
-            $table->integer('sender_user_id');
-            $table->integer('receiver_user_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('sender_user_id');
+            $table->unsignedBigInteger('receiver_user_id');
             $table->string('sender_type', 20);
             $table->string('receiver_type', 20);
-            $table->integer('purchase_request_id');
-            $table->integer('request_quotation_id')->nullable();
+            $table->unsignedBigInteger('purchase_request_id');
+            $table->unsignedBigInteger('request_quotation_id')->nullable();
             $table->timestamps();
         });
     }

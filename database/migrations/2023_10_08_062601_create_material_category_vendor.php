@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('material_categories', function (Blueprint $table) {
-            $table->softDeletes();
+        Schema::create('material_category_vendor', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('material_category_id');
+            $table->unsignedBigInteger('vendor_id');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('material_categories', function (Blueprint $table) {
-            $table->dropSoftDeletes();
-        });
+        Schema::dropIfExists('material_category_vendor');
     }
 };

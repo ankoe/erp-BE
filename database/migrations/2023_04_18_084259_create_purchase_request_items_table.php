@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchase_request_items', function (Blueprint $table) {
-            $table->id();
-            $table->integer('purchase_request_id');
-            $table->integer('material_id');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('purchase_request_id');
+            $table->unsignedBigInteger('material_id');
             $table->integer('price');
             $table->text('description');
-            $table->integer('quantity');
-            $table->integer('total');
-            $table->integer('vendor_id');
-            $table->integer('branch_id');
+            $table->decimal('quantity', 11, 2);
+            $table->decimal('total', 11, 2)->default(0);
+            $table->unsignedBigInteger('vendor_id');
+            $table->unsignedBigInteger('branch_id');
             $table->date('expected_at');
-            $table->string('file', 100);
+            $table->string('file', 100)->nullable();
             $table->boolean('is_approve')->nullable();
             $table->string('remarks', 200)->nullable();
             $table->string('incoterms', 100)->nullable();

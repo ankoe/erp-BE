@@ -4,11 +4,12 @@ namespace App\Models;
 
 use App\Traits\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchaseRequest extends Model
 {
-    use Filterable, HasFactory;
+    use Filterable, HasFactory, SoftDeletes;
 
     protected $fillable = [
         'company_id',
@@ -81,7 +82,8 @@ class PurchaseRequest extends Model
         $month = date('m');
         $year = date('Y');
 
-        $count = self::where('company_id', $company_id)
+        $count = self::withTrashed()
+            ->where('company_id', $company_id)
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
             ->count();

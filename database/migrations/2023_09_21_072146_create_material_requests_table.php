@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
-            $table->bigIncrements('id');
+        Schema::create('material_requests', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('material_category_id');
+            $table->unsignedBigInteger('material_category_id')->nullable();
             $table->string('name', 150);
-            $table->string('number', 30);
             $table->text('description');
             $table->unsignedBigInteger('unit_id');
-            $table->decimal('price', 11, 2);
+            $table->unsignedBigInteger('price')->nullable();
             $table->decimal('stock', 11, 2)->default(0);
             $table->string('attachment', 100);
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -32,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('material_requests');
     }
 };

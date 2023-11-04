@@ -7,7 +7,9 @@ use App\Http\Filters\Api\MaterialFilter;
 use App\Http\Resources\MaterialResource;
 use App\Http\Validations\MaterialValidation;
 use App\Models\Material;
+use App\Models\MaterialCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class MaterialController extends Controller
@@ -72,15 +74,19 @@ class MaterialController extends Controller
 
         $user = auth()->user();
 
+        $attachment = $request->hasFile('attachment')
+            ? $request->file('attachment')->store('public/material') : null;
+
         $material = Material::Create([
             'company_id'            => $user->company->id,
             'material_category_id'  => $request->material_category_id,
             'name'                  => $request->name,
             'number'                => $request->number,
             'description'           => $request->description,
-            'uom'                   => $request->uom,
+            'unit_id'               => $request->unit_id,
             'price'                 => $request->price,
             'stock'                 => $request->stock,
+            'attachment'            => $attachment,
         ]);
 
         return $this->responseSuccess($material, 'Add new material');
@@ -101,11 +107,17 @@ class MaterialController extends Controller
 
         if ($material)
         {
+            if ( $request->hasFile('attachment') )
+            {
+                if( !is_null($material->attachment) ) Storage::delete($material->attachment);
+                $material->attachment = $request->file('attachment')->store('public/material');
+            }
+
             $material->material_category_id = $request->material_category_id;
             $material->name                 = $request->name;
             $material->number               = $request->number;
             $material->description          = $request->description;
-            $material->uom                  = $request->uom;
+            $material->unit_id              = $request->unit_id;
             $material->price                = $request->price;
             $material->stock                = $request->stock;
 
@@ -136,6 +148,32 @@ class MaterialController extends Controller
             $material->delete();
 
             return $this->responseSuccess($material, 'Delete material', 204);
+        }
+
+        return $this->responseError([], 'Not found');
+    }
+
+
+    public function generateNumber(Request $request, $categoryId)
+    {
+
+        $request['category_id'] = $categoryId;
+
+        $validated = Validator::make($request->all(), MaterialValidation::generateNumber());
+
+        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
+
+        $user = auth()->user();
+
+        $materialCategory = MaterialCategory::where(['id' => $categoryId, 'company_id' => $user->company->id])->first();
+
+        if ($materialCategory)
+        {
+            $count = Material::where(['material_category_id' => $categoryId, 'company_id' => $user->company->id])->count();
+
+            $number = $materialCategory->taxonomy . str_pad($count + 1, 5, "0", STR_PAD_LEFT);
+
+            return $this->responseSuccess(['number' => $number], 'Generate material number');
         }
 
         return $this->responseError([], 'Not found');

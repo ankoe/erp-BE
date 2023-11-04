@@ -75,9 +75,11 @@ class BranchController extends Controller
         $branch = Branch::Create([
             'company_id'    => $user->company->id,
             'name'          => $request->name,
-            'address'         => $request->address,
-            'email'          => $request->email,
-            'mobile'         => $request->mobile,
+            'address'       => $request->address,
+            'email'         => $request->emails,
+            'mobile'        => $request->mobiles,
+            'postal_code'   => $request->postal_code,
+            'city'          => $request->city,
         ]);
 
         return $this->responseSuccess($branch, 'Add new location');
@@ -98,10 +100,12 @@ class BranchController extends Controller
 
         if ($branch)
         {
-            $branch->name   = $request->name;
-            $branch->address   = $request->address;
-            $branch->email   = $request->email;
-            $branch->mobile   = $request->mobile;
+            $branch->name           = $request->name;
+            $branch->address        = $request->address;
+            $branch->email          = $request->emails;
+            $branch->mobile         = $request->mobiles;
+            $branch->postal_code    = $request->postal_code;
+            $branch->city           = $request->city;
 
             $branch->save();
 

@@ -26,7 +26,10 @@ class PurchaseRequestController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))->where('company_id', $user->company->id)->paginate($request->input('per_page', 10));
+        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
+                                ->where('company_id', $user->company->id)
+                                ->orderBy('created_at', 'desc')
+                                ->paginate($request->input('per_page', 10));
 
         return PurchaseRequestResource::collection($purchaseRequests);
     }
@@ -41,7 +44,10 @@ class PurchaseRequestController extends Controller
         $user = auth()->user();
 
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))->where('company_id', $user->company->id)->get();
+        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
+                                ->where('company_id', $user->company->id)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
 
         return PurchaseRequestResource::collection($purchaseRequests);
     }
@@ -104,7 +110,7 @@ class PurchaseRequestController extends Controller
 
         if ($purchaseRequest)
         {
-            // income dijadikan null atau di ubah ke kategori lainnya
+            $purchaseRequest->purchaseRequestItem()->delete();
 
             $purchaseRequest->delete();
 

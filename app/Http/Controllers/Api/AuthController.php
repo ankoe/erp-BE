@@ -84,6 +84,7 @@ class AuthController extends Controller
                                     PermissionType::ConfigApproval,
                                     PermissionType::Material,
                                     PermissionType::MaterialCategory,
+                                    PermissionType::Unit,
                                     PermissionType::Role,
                                     PermissionType::User,
                                     PermissionType::Vendor,
@@ -153,8 +154,10 @@ class AuthController extends Controller
             // Begin create role for company
 
             $officeUserPermissions = Permission::whereIn('name',
-                                        [ PermissionType::PurchaseRequest ]
-                                        )->get();
+                                        [
+                                            PermissionType::PurchaseRequest,
+                                            PermissionType::MaterialRequest
+                                        ])->get();
 
             $officeUser = Role::create([
                 'name'          => $user->company->id.'_'.RoleGroup::Office.'_'.RoleUserDefault::User,
