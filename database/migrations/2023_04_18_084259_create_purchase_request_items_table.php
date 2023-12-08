@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('purchase_request_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('purchase_request_id');
+            $table->integer('purchase_request_status_id')->nullable();
             $table->unsignedBigInteger('material_id');
             $table->integer('price');
             $table->text('description');
@@ -24,12 +25,16 @@ return new class extends Migration
             $table->date('expected_at');
             $table->string('file', 100)->nullable();
             $table->boolean('is_approve')->nullable();
+            $table->boolean('is_approve_rfq')->default(false);
             $table->string('remarks', 200)->nullable();
             $table->string('incoterms', 100)->nullable();
             $table->integer('winning_vendor_id')->nullable();
             $table->integer('winning_vendor_price')->nullable();
             $table->integer('winning_vendor_stock')->nullable();
             $table->string('winning_vendor_incoterms', 100)->nullable();
+            $table->string('code_rfq', 20)->nullable();
+            $table->string('code_po', 20)->nullable();
+            $table->date('po_created_at')->nullable();
             $table->timestamps();
         });
     }

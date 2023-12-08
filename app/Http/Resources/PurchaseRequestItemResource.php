@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Http\Resources\BranchResource;
 use App\Http\Resources\MaterialResource;
+use App\Http\Resources\PurchaseRequestResource;
 use App\Http\Resources\RequestQuotationResource;
 use App\Http\Resources\VendorResource;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class PurchaseRequestItemResource extends JsonResource
     {
         return [
             "id"                        => $this->id,
-            "purchase_request_id"       => $this->purchase_request_id,
+            "status"                    => $this->purchase_request_status_id ? new PurchaseRequestStatusResource($this->PurchaseRequestStatus) : null,
             "material"                  => new MaterialResource($this->material),
             "price"                     => $this->price,
             "description"               => $this->description,
@@ -32,6 +33,7 @@ class PurchaseRequestItemResource extends JsonResource
             "expected_at"               => $this->expected_at,
             "file"                      => url(Storage::url($this->file ?? $this->material->attachment)),
             "is_approve"                => $this->is_approve,
+            "is_approve_rfq"            => $this->is_approve_rfq,
             "remarks"                   => $this->remarks,
             "incoterms"                 => $this->incoterms,
             "winning_vendor"            => $this->winning_vendor_id ? new VendorResource($this->winningVendor) : null,
@@ -40,6 +42,9 @@ class PurchaseRequestItemResource extends JsonResource
             "winning_vendor_price"      => $this->winning_vendor_price,
             "winning_vendor_incoterms"  => $this->winning_vendor_incoterms,
             "request_quotation"         => RequestQuotationResource::collection($this->requestQuotation),
+            "code_rfq"                  => $this->code_rfq,
+            "code_po"                   => $this->code_po,
+            "po_created_at"             => $this->po_created_at,
             "created_at"                => $this->created_at,
             "updated_at"                => $this->updated_at
         ];

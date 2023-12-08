@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\PurchaseRequestFilter;
-use App\Http\Resources\PurchaseRequestResource;
+use App\Http\Resources\PurchaseRequestItemResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Models\ConfigApproval;
 use App\Models\PurchaseRequest;
@@ -29,14 +29,17 @@ class PurchaseOrderController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequestItems = PurchaseRequestItem::filter(new PurchaseRequestFilter($request))
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->where('title', 'po released');
+                                    $query->where('title', 'waiting po confirmation')
+                                    ->orWhere('title', 'po released');
                                 })
                                 ->paginate($request->input('per_page', 10));
 
-        return PurchaseRequestResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequestItems);
     }
 
 
@@ -49,14 +52,17 @@ class PurchaseOrderController extends Controller
         $user = auth()->user();
 
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequestItems = PurchaseRequestItem::filter(new PurchaseRequestFilter($request))
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->where('title', 'po released');
+                                    $query->where('title', 'waiting po confirmation')
+                                    ->orWhere('title', 'po released');
                                 })
                                 ->get();
 
-        return PurchaseRequestResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequestItems);
     }
 
 
@@ -71,11 +77,14 @@ class PurchaseOrderController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+        $purchaseRequestItem = PurchaseRequestItem::where('id', $id)
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })->first();
 
-        if ($purchaseRequest)
+        if ($purchaseRequestItem)
         {
-            return $this->responseSuccess(new PurchaseRequestResource($purchaseRequest), 'Get detail');
+            return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequestItem), 'Get detail');
         }
 
         return $this->responseError([], 'Not found');

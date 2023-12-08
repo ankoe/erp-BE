@@ -12,6 +12,7 @@ class PurchaseRequestItem extends Model
 
     protected $fillable = [
         'purchase_request_id',
+        'purchase_request_status_id',
         'material_id',
         'price',
         'description',
@@ -22,12 +23,16 @@ class PurchaseRequestItem extends Model
         'expected_at',
         'file',
         'is_approve',
+        'is_approve_rfq',
         'remarks',
         'incoterms',
         'winning_vendor_id',
         'winning_vendor_price',
         'winning_vendor_stock',
         'winning_vendor_incoterms',
+        'code_rfq',
+        'code_po',
+        'po_created_at'
     ];
 
     /***********************************************
@@ -64,6 +69,11 @@ class PurchaseRequestItem extends Model
         return $this->hasMany(RequestQuotation::class);
     }
 
+    public function purchaseRequestStatus()
+    {
+        return $this->belongsTo(PurchaseRequestStatus::class, 'purchase_request_status_id');
+    }
+
     /***********************************************
      *  2. Getter & Setter
     ***********************************************/
@@ -75,4 +85,50 @@ class PurchaseRequestItem extends Model
     /***********************************************
      *  4. Function
     ***********************************************/
+
+    public static function generateRFQNumber()
+    {
+        $company_id = auth()->user()->company->id;
+        $month = date('m');
+        $year = date('Y');
+
+        $count = self::whereHas('purchaseRequest', function($q) use ($company_id) {
+                $q->where('company_id', $company_id);
+            })
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->whereNotNull('code_rfq')
+            ->count();
+
+        // Mendapatkan nomor urut dokumen
+        $documentNumber = $count ? ($count + 1) : 1;
+
+        // Format nomor dokumen dengan menambahkan bulan dan tahun
+        $documentNumber = 'RFQ-' . substr($year, 2) . $month . '-' . str_pad($documentNumber, 4, '0', STR_PAD_LEFT);
+
+        return $documentNumber;
+    }
+
+    public static function generatePONumber()
+    {
+        $company_id = auth()->user()->company->id;
+        $month = date('m');
+        $year = date('Y');
+
+        $count = self::whereHas('purchaseRequest', function($q) use ($company_id) {
+                $q->where('company_id', $company_id);
+            })
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->whereNotNull('code_po')
+            ->count();
+
+        // Mendapatkan nomor urut dokumen
+        $documentNumber = $count ? ($count + 1) : 1;
+
+        // Format nomor dokumen dengan menambahkan bulan dan tahun
+        $documentNumber = 'PO-' . substr($year, 2) . $month . '-' . str_pad($documentNumber, 4, '0', STR_PAD_LEFT);
+
+        return $documentNumber;
+    }
 }

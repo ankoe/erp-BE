@@ -31,8 +31,8 @@ class RequestForQuotationController extends Controller
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
-        $purchaseRequests = PurchaseRequest::whereHas(
-                                'purchaseRequestItem.requestQuotation.vendor',
+        $purchaseRequestItems = PurchaseRequestItem::whereHas(
+                                'requestQuotation.vendor',
                                 function ($query) use ($slug) {
                                     $query->where('slug', $slug);
                                 })
@@ -43,7 +43,7 @@ class RequestForQuotationController extends Controller
                                 })
                                 ->paginate($request->input('per_page', 10));
 
-        return RequestForQuotationResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequestItems);
     }
 
 
@@ -54,8 +54,8 @@ class RequestForQuotationController extends Controller
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::whereHas(
-                                'purchaseRequestItem.requestQuotation.vendor',
+        $purchaseRequestItems = PurchaseRequestItem::whereHas(
+                                'requestQuotation.vendor',
                                 function ($query) use ($slug) {
                                     $query->where('slug', $slug);
                                 })
@@ -66,7 +66,7 @@ class RequestForQuotationController extends Controller
                                 })
                                 ->get();
 
-        return RequestForQuotationResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequestItems);
     }
 
 
@@ -79,7 +79,7 @@ class RequestForQuotationController extends Controller
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
 
-        $purchaseRequestItems = PurchaseRequestItem::where('purchase_request_id', $id)
+        $purchaseRequestItems = PurchaseRequestItem::where('id', $id)
                                     ->whereHas(
                                     'requestQuotation.vendor',
                                     function ($query) use ($slug) {
@@ -105,14 +105,20 @@ class RequestForQuotationController extends Controller
 
         // if ($validated->fails()) return $this->responseError($validated->errors(), 'The given data was invalid');
 
-        foreach ($request->items as $item) {
-            RequestQuotation::where('id', $item['id'])
-                ->update([
-                    'vendor_price' => $item['vendor_price'],
-                    'vendor_stock' => $item['vendor_stock'],
-                    'vendor_incoterms' => $item['vendor_incoterms'],
-                ]);
-        }
+        $vendorAttachmentHeader = $request->hasFile('vendor_attachment_header')? $request->file('vendor_attachment_header')->store('public/rfq') : null;
+
+        $vendorAttachmentItem = $request->hasFile('vendor_attachment_item')? $request->file('vendor_attachment_item')->store('public/rfq') : null;
+
+        RequestQuotation::where('id', $request->id)
+            ->update([
+                'vendor_price' => $request->vendor_price,
+                'vendor_stock' => $request->vendor_stock,
+                'vendor_incoterms' => $request->vendor_incoterms,
+                'vendor_delivery_at' => $request->vendor_delivery_at,
+                'vendor_attachment_header' => $vendorAttachmentHeader,
+                'vendor_attachment_item' => $vendorAttachmentItem,
+                'vendor_remarks' => $request->vendor_remarks,
+            ]);
 
         return $this->responseSuccess([], 'offer success');
     }

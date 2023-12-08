@@ -17,7 +17,11 @@ class RequestQuotation extends Model
         'vendor_stock',
         'vendor_incoterms',
         'vendor_is_agree',
-        'is_selected'
+        'is_selected',
+        'vendor_delivery_at',
+        'vendor_attachment_header',
+        'vendor_attachment_item',
+        'vendor_remarks',
     ];
 
     protected $casts = [

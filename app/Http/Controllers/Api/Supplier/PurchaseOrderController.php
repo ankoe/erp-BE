@@ -29,17 +29,17 @@ class PurchaseOrderController extends Controller
 
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
-        $purchaseRequests = PurchaseRequest::whereHas(
-                                'purchaseRequestItem.requestQuotation.vendor',
+        $purchaseRequestItems = purchaseRequestItem::whereHas(
+                                'requestQuotation.vendor',
                                 function ($query) use ($slug) {
                                     $query->where('slug', $slug);
                                 })
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->where('title', 'po released');
+                                    $query->where('title', 'waiting po confirmation'); //'po released'
                                 })
                                 ->paginate($request->input('per_page', 10));
 
-        return PurchaseRequestResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequestItems);
     }
 
 
@@ -50,17 +50,17 @@ class PurchaseOrderController extends Controller
         if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid');
 
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::whereHas(
-                                'purchaseRequestItem.requestQuotation.vendor',
+        $purchaseRequestItems = purchaseRequestItem::whereHas(
+                                'requestQuotation.vendor',
                                 function ($query) use ($slug) {
                                     $query->where('slug', $slug);
                                 })
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->where('title', 'po released');
+                                    $query->where('title', 'waiting po confirmation'); //'po released'
                                 })
                                 ->get();
 
-        return PurchaseRequestResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequestItems);
     }
 
 
@@ -78,6 +78,9 @@ class PurchaseOrderController extends Controller
                                     'requestQuotation.vendor',
                                     function ($query) use ($slug) {
                                         $query->where('slug', $slug);
+                                    })
+                                    ->whereHas('purchaseRequestStatus', function($query) {
+                                        $query->where('title', 'waiting po confirmation'); //'po released'
                                     })
                                     ->get();
 

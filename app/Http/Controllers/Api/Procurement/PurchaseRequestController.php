@@ -32,7 +32,7 @@ class PurchaseRequestController extends Controller
         $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
                                 ->where('company_id', $user->company->id)
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->whereNot('title', 'draft');
+                                    $query->whereNotIn('title', ['draft', 'waiting office approval', 'reject office approval']);
                                 })
                                 ->orderBy('updated_at', 'desc')
                                 ->paginate($request->input('per_page', 10));
@@ -53,7 +53,7 @@ class PurchaseRequestController extends Controller
         $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
                                 ->where('company_id', $user->company->id)
                                 ->whereHas('purchaseRequestStatus', function($query) {
-                                    $query->whereNot('title', 'draft');
+                                    $query->whereNotIn('title', ['draft', 'waiting office approval', 'reject office approval']);
                                 })
                                 ->orderBy('updated_at', 'desc')
                                 ->get();
@@ -112,11 +112,17 @@ class PurchaseRequestController extends Controller
 
                     if (!$isApprove) $allApprove = false;
 
+                    $statusTitle = $isApprove? 'waiting rfq response' : 'reject office approval';
+
+                    $purchaseRequestStatus = PurchaseRequestStatus::where('title', $statusTitle)->first();
+
                     $purchaseRequestItem = PurchaseRequestItem::where('purchase_request_id', $purchaseRequest->id)
                                         ->where('id', $item['id'])
                                         ->update([
-                                            'is_approve'    => $isApprove,
-                                            'remarks'       => $item['remarks'],
+                                            'is_approve'                    => $isApprove,
+                                            'remarks'                       => $item['remarks'],
+                                            'code_rfq'                      => PurchaseRequestItem::generateRFQNumber(),
+                                            'purchase_request_status_id'    => $purchaseRequestStatus->id,
                                         ]);
                 }
 
@@ -166,7 +172,7 @@ class PurchaseRequestController extends Controller
                 $purchaseRequestStatus = PurchaseRequestStatus::where('title', $statusTitle)->first();
 
                 $purchaseRequest->purchase_request_status_id    = $purchaseRequestStatus->id;
-                $purchaseRequest->code_rfq                      = PurchaseRequest::generateRFQNumber();
+                // $purchaseRequest->code_rfq                      = PurchaseRequest::generateRFQNumber();
 
                 $purchaseRequest->save();
 

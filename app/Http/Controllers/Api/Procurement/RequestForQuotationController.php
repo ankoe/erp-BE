@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Procurement;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Api\PurchaseRequestFilter;
-use App\Http\Resources\RequestForQuotationResource;
+use App\Http\Resources\PurchaseRequestItemResource;
 use App\Http\Validations\PurchaseRequestValidation;
 use App\Mail\Approval\VendorRFQAccessMail;
 use App\Models\ConfigApproval;
@@ -32,18 +32,18 @@ class RequestForQuotationController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequests = PurchaseRequestItem::filter(new PurchaseRequestFilter($request))
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->where('title', 'waiting rfq response')
-                                    ->orWhere('title', 'waiting rfq approval')
-                                    ->orWhere('title', 'waiting po confirmation');
-
+                                    ->orWhere('title', 'waiting rfq approval');
                                 })
                                 ->orderBy('updated_at', 'desc')
                                 ->paginate($request->input('per_page', 10));
 
-        return RequestForQuotationResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequests);
     }
 
 
@@ -56,17 +56,18 @@ class RequestForQuotationController extends Controller
         $user = auth()->user();
 
         // Perlu diseragamkan return responsenya
-        $purchaseRequests = PurchaseRequest::filter(new PurchaseRequestFilter($request))
-                                ->where('company_id', $user->company->id)
+        $purchaseRequests = PurchaseRequestItem::filter(new PurchaseRequestFilter($request))
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })
                                 ->whereHas('purchaseRequestStatus', function($query) {
                                     $query->where('title', 'waiting rfq response')
-                                    ->orWhere('title', 'waiting rfq approval')
-                                    ->orWhere('title', 'waiting po confirmation');
+                                    ->orWhere('title', 'waiting rfq approval');
                                 })
                                 ->orderBy('updated_at', 'desc')
                                 ->get();
 
-        return RequestForQuotationResource::collection($purchaseRequests);
+        return PurchaseRequestItemResource::collection($purchaseRequests);
     }
 
 
@@ -81,11 +82,15 @@ class RequestForQuotationController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+        $purchaseRequestItem = PurchaseRequestItem::where('id',$id)
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })
+                                ->first();
 
-        if ($purchaseRequest)
+        if ($purchaseRequestItem)
         {
-            return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'Get detail');
+            return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequestItem), 'Get detail');
         }
 
         return $this->responseError([], 'Not found');
@@ -102,13 +107,18 @@ class RequestForQuotationController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+        $purchaseRequest = PurchaseRequest::where('company_id', $user->company->id)
+                                ->whereHas('purchaseRequestItem', function($query) use ($id) {
+                                    $query->where('id', $id);
+                                })->first();
 
         if ($purchaseRequest)
         {
             DB::beginTransaction();
 
             try {
+                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq approval')->first();
+
                 $vendors = [];
                 $bulkRequestQuotation = [];
                 foreach ($request->items as $item) {
@@ -123,7 +133,11 @@ class RequestForQuotationController extends Controller
                         array_push($vendors, $vendor);
                     }
 
-                    PurchaseRequestItem::where('id', $item['id'])->update([ 'incoterms' => $item['incoterms'] ]);
+                    PurchaseRequestItem::where('id', $item['id'])
+                                            ->update([
+                                                'incoterms' => $item['incoterms'],
+                                                'purchase_request_status_id' => $purchaseRequestStatus->id
+                                            ]);
                 }
 
                 RequestQuotation::insert($bulkRequestQuotation);
@@ -137,7 +151,7 @@ class RequestForQuotationController extends Controller
 
                 // ganti status
 
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq approval')->first();
+
 
                 $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
 
@@ -145,7 +159,7 @@ class RequestForQuotationController extends Controller
 
                 DB::commit();
 
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
+                return $this->responseSuccess(new PurchaseRequestItemResource($purchaseRequest->purchaseRequestItem()->first()), 'procurement approval done');
 
             } catch(\Throwable $e) {
 
@@ -169,34 +183,33 @@ class RequestForQuotationController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+        $purchaseRequestItem = PurchaseRequestItem::where('id',$id)
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })->first();
 
-        if ($purchaseRequest)
+        if ($purchaseRequestItem)
         {
             DB::beginTransaction();
 
             try {
-                $bulkPurchaseRequestItemId = [];
-                $bulkRequestQuotationId = [];
-                foreach ($request->items as $item) {
-                    array_push($bulkPurchaseRequestItemId, $item['id']);
-                    array_push($bulkRequestQuotationId, $item['selected_id']);
-                }
 
-                RequestQuotation::whereIn('purchase_request_item_id', $bulkPurchaseRequestItemId)->update(['is_selected' => false]);
-                RequestQuotation::whereIn('id', $bulkRequestQuotationId)->update(['is_selected' => true]);
+                RequestQuotation::where('purchase_request_item_id', $purchaseRequestItem->id)->update(['is_selected' => false]);
+                RequestQuotation::where('id', $request->items[0]['selected_id'])->update(['is_selected' => true]);
 
                 // ganti status
 
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting po confirmation')->first();
+                // $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting po confirmation')->first();
 
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
+                // $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
 
-                $purchaseRequest->save();
+                $purchaseRequestItem->is_approve_rfq = true;
+
+                $purchaseRequestItem->save();
 
                 DB::commit();
 
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'rfq send to approval role');
+                return $this->responseSuccess([], 'rfq send to approval role');
 
             } catch(\Throwable $e) {
 
@@ -221,9 +234,12 @@ class RequestForQuotationController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+        $purchaseRequestItem = PurchaseRequestItem::where('id',$id)
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })->first();
 
-        if ($purchaseRequest)
+        if ($purchaseRequestItem)
         {
             DB::beginTransaction();
 
@@ -231,15 +247,15 @@ class RequestForQuotationController extends Controller
 
                 // ganti status
 
-                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'po released')->first();
+                $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting po confirmation')->first();
 
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
+                $purchaseRequestItem->purchase_request_status_id   = $purchaseRequestStatus->id;
 
-                $purchaseRequest->save();
+                $purchaseRequestItem->save();
 
                 DB::commit();
 
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
+                return $this->responseSuccess([], 'procurement approval set approve done');
 
             } catch(\Throwable $e) {
 
@@ -264,9 +280,12 @@ class RequestForQuotationController extends Controller
 
         $user = auth()->user();
 
-        $purchaseRequest = PurchaseRequest::where(['id' => $id, 'company_id' => $user->company->id])->first();
+        $purchaseRequestItem = PurchaseRequestItem::where('id',$id)
+                                ->whereHas('purchaseRequest', function($q) use ($user) {
+                                    $q->where('company_id', $user->company->id);
+                                })->first();
 
-        if ($purchaseRequest)
+        if ($purchaseRequestItem)
         {
             DB::beginTransaction();
 
@@ -276,13 +295,13 @@ class RequestForQuotationController extends Controller
 
                 $purchaseRequestStatus = PurchaseRequestStatus::where('title', 'waiting rfq approval')->first();
 
-                $purchaseRequest->purchase_request_status_id   = $purchaseRequestStatus->id;
+                $purchaseRequestItem->purchase_request_status_id   = $purchaseRequestStatus->id;
 
-                $purchaseRequest->save();
+                $purchaseRequestItem->save();
 
                 DB::commit();
 
-                return $this->responseSuccess(new RequestForQuotationResource($purchaseRequest), 'procurement approval done');
+                return $this->responseSuccess([], 'procurement approval set reject is done');
 
             } catch(\Throwable $e) {
 

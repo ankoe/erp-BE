@@ -21,6 +21,10 @@ return new class extends Migration
             $table->string('vendor_incoterms', 100)->nullable();
             $table->boolean('vendor_is_agree')->nullable();
             $table->boolean('is_selected')->nullable();
+            $table->date('vendor_delivery_at')->nullable();
+            $table->string('vendor_attachment_header', 100)->nullable();
+            $table->string('vendor_attachment_item', 100)->nullable();
+            $table->string('vendor_remarks', 200)->nullable();
             $table->timestamps();
         });
     }
